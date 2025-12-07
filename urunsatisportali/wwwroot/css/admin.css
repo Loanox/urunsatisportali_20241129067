@@ -1,0 +1,16 @@
+/* Admin Panel Styles */
+
+:root {
+    --sidebar-width: 250px;
+    --primary-color: #4f46e5;
+    --sidebar-bg: #1e293b;
+    --sidebar-hover: #334155;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8fafc;
+}
+
+/* Additional admin-specific styles can be added here */
+
