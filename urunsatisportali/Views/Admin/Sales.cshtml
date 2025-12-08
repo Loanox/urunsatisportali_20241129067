@@ -7,7 +7,7 @@
 <div class="page-header d-flex justify-content-between align-items-center">
     <h2><i class="bi bi-cart-check"></i> Satýþlar</h2>
     <a asp-action="CreateSale" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Yeni Satýþ Oluþtur
+        <i class="bi bi-plus-circle"></i> Yeni
     </a>
 </div>
 
@@ -26,10 +26,10 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Ara</button>
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Ara</button>
             </div>
             <div class="col-md-2">
-                <a asp-action="Sales" class="btn btn-outline-secondary w-100">Temizle</a>
+                <a asp-action="Sales" class="btn btn-outline-secondary w-100"><i class="bi bi-x-circle"></i> Temizle</a>
             </div>
         </form>
     </div>
@@ -45,7 +45,7 @@
                         <th>Net</th>
                         <th>Durum</th>
                         <th>Tarih</th>
-                        <th>Ýþlemler</th>
+                        <th class="text-end">Ýþlemler</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,7 +53,7 @@
                     {
                         <tr>
                             <td><strong>@sale.SaleNumber</strong></td>
-                            <td>@sale.Customer.Name</td>
+                            <td>@(sale.Customer != null ? sale.Customer.Name : "-")</td>
                             <td>@sale.TotalAmount.ToString("C")</td>
                             <td>@sale.Discount.ToString("C")</td>
                             <td><strong>@sale.FinalAmount.ToString("C")</strong></td>
@@ -64,7 +64,7 @@
                                 }
                                 else if (sale.Status == "Pending")
                                 {
-                                    <span class="badge bg-warning">Beklemede</span>
+                                    <span class="badge bg-warning text-dark">Beklemede</span>
                                 }
                                 else
                                 {
@@ -72,10 +72,12 @@
                                 }
                             </td>
                             <td>@sale.SaleDate.ToString("dd.MM.yyyy HH:mm")</td>
-                            <td>
-                                <a asp-action="SaleDetails" asp-route-id="@sale.Id" class="btn btn-sm btn-info">
-                                    <i class="bi bi-eye"></i> Detaylar
-                                </a>
+                            <td class="text-end">
+                                <div class="btn-group" role="group">
+                                    <a asp-action="SaleDetails" asp-route-id="@sale.Id" class="btn btn-sm btn-outline-info" title="Detay">
+                                        <i class="bi bi-eye"></i> Detay
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     }

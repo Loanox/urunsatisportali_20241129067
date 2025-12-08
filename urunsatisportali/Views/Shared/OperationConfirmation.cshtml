@@ -1,0 +1,21 @@
+@{
+    Layout = "_AdminLayout";
+    var message = ViewBag.Message as string ?? "Ýþlem baþarýyla tamamlandý.";
+    var returnUrl = ViewBag.ReturnUrl as string ?? Url.Action("Dashboard", "Admin")!;
+}
+
+<div class="d-flex justify-content-center mt-5">
+    <div class="card shadow" style="max-width: 640px; width: 100%;">
+        <div class="card-body text-center">
+            <div class="mb-3">
+                <div class="display-6 text-success"><i class="bi bi-check-circle"></i></div>
+            </div>
+            <h4 class="mb-3">Baþarýlý</h4>
+            <p class="text-muted">@message</p>
+            <div class="d-flex gap-2 justify-content-center mt-4">
+                <a class="btn btn-primary" href="@returnUrl"><i class="bi bi-arrow-left"></i> Geri Dön</a>
+                <a class="btn btn-outline-secondary" href="@Url.Action("Dashboard", "Admin")"><i class="bi bi-house"></i> Panel</a>
+            </div>
+        </div>
+    </div>
+</div>

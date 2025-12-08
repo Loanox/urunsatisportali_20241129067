@@ -21,13 +21,13 @@
                     <dd class="col-sm-8"><strong>@Model.SaleNumber</strong></dd>
 
                     <dt class="col-sm-4">Müþteri:</dt>
-                    <dd class="col-sm-8">@Model.Customer.Name</dd>
+                    <dd class="col-sm-8">@(Model.Customer?.Name ?? "N/A")</dd>
 
                     <dt class="col-sm-4">Müþteri E-posta:</dt>
-                    <dd class="col-sm-8">@(Model.Customer.Email ?? "N/A")</dd>
+                    <dd class="col-sm-8">@(Model.Customer?.Email ?? "N/A")</dd>
 
                     <dt class="col-sm-4">Müþteri Telefon:</dt>
-                    <dd class="col-sm-8">@(Model.Customer.Phone ?? "N/A")</dd>
+                    <dd class="col-sm-8">@(Model.Customer?.Phone ?? "N/A")</dd>
 
                     <dt class="col-sm-4">Satýþ Tarihi:</dt>
                     <dd class="col-sm-8">@Model.SaleDate.ToString("dd.MM.yyyy HH:mm")</dd>
@@ -40,7 +40,7 @@
                         }
                         else if (Model.Status == "Pending")
                         {
-                            <span class="badge bg-warning">Beklemede</span>
+                            <span class="badge bg-warning text-dark">Beklemede</span>
                         }
                         else
                         {
@@ -74,7 +74,7 @@
                             @foreach (var item in Model.SaleItems)
                             {
                                 <tr>
-                                    <td>@item.Product.Name</td>
+                                    <td>@item.Product?.Name</td>
                                     <td>@item.Quantity</td>
                                     <td>@item.UnitPrice.ToString("C")</td>
                                     <td>@item.Discount.ToString("C")</td>

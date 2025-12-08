@@ -30,6 +30,15 @@ namespace urunsatisportali.Controllers
             }
         }
 
+        // Confirmation page
+        [HttpGet]
+        public IActionResult Confirmation(string message, string? returnUrl)
+        {
+            ViewBag.Message = string.IsNullOrWhiteSpace(message) ? "İşlem başarıyla tamamlandı." : message;
+            ViewBag.ReturnUrl = string.IsNullOrWhiteSpace(returnUrl) ? Url.Action(nameof(Dashboard)) : returnUrl;
+            return View("~/Views/Shared/OperationConfirmation.cshtml");
+        }
+
         // Dashboard
         public async Task<IActionResult> Dashboard()
         {
@@ -128,7 +137,7 @@ namespace urunsatisportali.Controllers
                         return Json(new { success = true, message = "Ürün başarıyla eklendi.", productId = product.Id });
                     }
 
-                    return RedirectToAction(nameof(Products));
+                    return RedirectToAction(nameof(Confirmation), new { message = "Ürün başarıyla eklendi.", returnUrl = Url.Action(nameof(Products)) });
                 }
                 catch (Exception ex)
                 {
@@ -145,26 +154,24 @@ namespace urunsatisportali.Controllers
             var categories = await _context.Categories.ToListAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
 
+            var xreq2 = Request?.Headers["X-Requested-With"].ToString();
+            if (string.Equals(xreq2, "XMLHttpRequest", StringComparison.Ordinal))
             {
-                var xreq = Request?.Headers["X-Requested-With"].ToString();
-                if (string.Equals(xreq, "XMLHttpRequest", StringComparison.Ordinal))
-                {
-                    var errors = ModelState
-                        .Where(x => x.Value?.Errors.Count > 0)
-                        .SelectMany(x => x.Value!.Errors.Select(e => new
-                        {
-                            field = x.Key,
-                            message = string.IsNullOrEmpty(e.ErrorMessage) ? "Bu alan geçersiz." : e.ErrorMessage
-                        }))
-                        .ToList();
+                var errors = ModelState
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .SelectMany(x => x.Value!.Errors.Select(e => new
+                    {
+                        field = x.Key,
+                        message = string.IsNullOrEmpty(e.ErrorMessage) ? "Bu alan geçersiz." : e.ErrorMessage
+                    }))
+                    .ToList();
 
-                    var errorMessages = errors.Select(e => e.message).Distinct().ToList();
-                    var mainMessage = errorMessages.Count > 0
-                        ? "Lütfen şu hataları düzeltin: " + string.Join(", ", errorMessages.Take(3))
-                        : "Lütfen form hatalarını düzeltin.";
+                var errorMessages = errors.Select(e => e.message).Distinct().ToList();
+                var mainMessage = errorMessages.Count > 0
+                    ? "Lütfen şu hataları düzeltin: " + string.Join(", ", errorMessages.Take(3))
+                    : "Lütfen form hatalarını düzeltin.";
 
-                    return Json(new { success = false, message = mainMessage, errors = errors });
-                }
+                return Json(new { success = false, message = mainMessage, errors = errors });
             }
 
             return View(product);
@@ -232,71 +239,42 @@ namespace urunsatisportali.Controllers
                     var existingProduct = await _context.Products.FindAsync(id);
                     if (existingProduct == null)
                     {
-                        var xreq2 = Request?.Headers["X-Requested-With"].ToString();
-                        if (string.Equals(xreq2, "XMLHttpRequest", StringComparison.Ordinal))
-                        {
-                            return Json(new { success = false, message = "Ürün bulunamadı." });
-                        }
                         return NotFound();
                     }
 
                     existingProduct.Name = product.Name ?? existingProduct.Name;
                     existingProduct.SKU = product.SKU;
                     existingProduct.Description = product.Description;
-
                     if (product.CategoryId > 0)
                     {
                         existingProduct.CategoryId = product.CategoryId;
                     }
-
                     existingProduct.Price = product.Price;
                     existingProduct.StockQuantity = product.StockQuantity;
                     existingProduct.Brand = product.Brand;
                     existingProduct.Unit = product.Unit;
                     existingProduct.IsActive = product.IsActive;
                     existingProduct.UpdatedAt = DateTime.Now;
-
-                    var changes = await _context.SaveChangesAsync();
-                    _logger.LogInformation("Product {ProductId} updated successfully. Changes saved: {Changes}", id, changes);
+                    await _context.SaveChangesAsync();
 
                     var xreq3 = Request?.Headers["X-Requested-With"].ToString();
                     if (string.Equals(xreq3, "XMLHttpRequest", StringComparison.Ordinal))
                     {
                         return Json(new { success = true, message = "Ürün başarıyla güncellendi." });
                     }
-
-                    return RedirectToAction(nameof(Products));
+                    return RedirectToAction(nameof(Confirmation), new { message = "Ürün başarıyla güncellendi.", returnUrl = Url.Action(nameof(Products)) });
                 }
-                catch (DbUpdateConcurrencyException ex)
+                catch
                 {
-                    _logger.LogError(ex, "Concurrency error updating product {ProductId}", id);
-                    if (!ProductExists(product.Id))
+                    var xreq4 = Request?.Headers["X-Requested-With"].ToString();
+                    if (string.Equals(xreq4, "XMLHttpRequest", StringComparison.Ordinal))
                     {
-                        var xreq4 = Request?.Headers["X-Requested-With"].ToString();
-                        if (string.Equals(xreq4, "XMLHttpRequest", StringComparison.Ordinal))
-                        {
-                            return Json(new { success = false, message = "Ürün bulunamadı." });
-                        }
-                        return NotFound();
+                        return Json(new { success = false, message = "Güncelleme sırasında bir hata oluştu." });
                     }
-                    var errorMsg = "Ürün başka bir kullanıcı tarafından değiştirildi. Lütfen sayfayı yenileyip tekrar deneyin.";
-                    var xreq5 = Request?.Headers["X-Requested-With"].ToString();
-                    if (string.Equals(xreq5, "XMLHttpRequest", StringComparison.Ordinal))
-                    {
-                        return Json(new { success = false, message = errorMsg });
-                    }
-                    ModelState.AddModelError("", errorMsg);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error updating product {ProductId}: {Message}", id, ex.Message);
-                    var errorMsg = $"Ürün güncellenirken bir hata oluştu: {ex.Message}";
-                    var xreq6 = Request?.Headers["X-Requested-With"].ToString();
-                    if (string.Equals(xreq6, "XMLHttpRequest", StringComparison.Ordinal))
-                    {
-                        return Json(new { success = false, message = errorMsg });
-                    }
-                    ModelState.AddModelError("", errorMsg);
+                    ModelState.AddModelError("", "Güncelleme sırasında bir hata oluştu.");
+                    var categoryList = await _context.Categories.ToListAsync();
+                    ViewBag.Categories = new SelectList(categoryList, "Id", "Name", product.CategoryId);
+                    return View(product);
                 }
             }
             else
@@ -307,8 +285,8 @@ namespace urunsatisportali.Controllers
                         .SelectMany(x => x.Value?.Errors.Select(e => e.ErrorMessage) ?? Enumerable.Empty<string>())));
             }
 
-            var categories = await _context.Categories.ToListAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
+            var categoryListOuter = await _context.Categories.ToListAsync();
+            ViewBag.Categories = new SelectList(categoryListOuter, "Id", "Name", product.CategoryId);
 
             {
                 var xreq = Request?.Headers["X-Requested-With"].ToString();
@@ -345,8 +323,7 @@ namespace urunsatisportali.Controllers
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
             }
-
-            return RedirectToAction(nameof(Products));
+            return RedirectToAction(nameof(Confirmation), new { message = "Ürün başarıyla silindi.", returnUrl = Url.Action(nameof(Products)) });
         }
 
         // Categories Management
@@ -575,18 +552,19 @@ namespace urunsatisportali.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateSale(Sale sale, List<int> productIds, List<int> quantities)
+        public async Task<IActionResult> CreateSale(Sale sale, [FromForm] List<int>? productIds, [FromForm] List<int>? quantities)
         {
             sale.SaleItems ??= new List<SaleItem>();
+            var isAjax = string.Equals(Request?.Headers["X-Requested-With"].ToString(), "XMLHttpRequest", StringComparison.Ordinal);
 
             if (productIds == null || productIds.Count == 0)
             {
-                ModelState.AddModelError("", "Lütfen en az bir ürün seçin.");
+                ModelState.AddModelError(string.Empty, "Lütfen en az bir ürün seçin.");
             }
 
             if (productIds != null && (quantities == null || productIds.Count != quantities.Count))
             {
-                ModelState.AddModelError("", "Ürün kalemleri doğru biçimde gönderilmedi.");
+                ModelState.AddModelError(string.Empty, "Ürün kalemleri doğru biçimde gönderilmedi.");
             }
 
             decimal subtotal = 0m;
@@ -597,89 +575,114 @@ namespace urunsatisportali.Controllers
                     var product = await _context.Products.FindAsync(productIds[i]);
                     if (product == null)
                     {
-                        ModelState.AddModelError("", $"Seçilen ürün bulunamadı (ID: {productIds[i]}).");
+                        ModelState.AddModelError(string.Empty, $"Seçilen ürün bulunamadı (ID: {productIds[i]}).");
                         continue;
                     }
 
-                    if (product.StockQuantity < quantities[i])
+                    var qty = quantities[i];
+                    if (qty <= 0)
                     {
-                        ModelState.AddModelError("", $"{product.Name} için yeterli stok yok. (Mevcut: {product.StockQuantity})");
+                        ModelState.AddModelError(string.Empty, $"{product.Name} için geçersiz adet girildi.");
+                        continue;
                     }
 
-                    subtotal += product.Price * quantities[i];
+                    if (product.StockQuantity < qty)
+                    {
+                        ModelState.AddModelError(string.Empty, $"{product.Name} için yeterli stok yok. (Mevcut: {product.StockQuantity})");
+                        continue;
+                    }
+
+                    subtotal += product.Price * qty;
                 }
             }
 
             var taxAmount = subtotal * (sale.Tax / 100m);
             var discountAmount = subtotal * (sale.Discount / 100m);
-
             sale.TotalAmount = subtotal;
             sale.FinalAmount = subtotal + taxAmount - discountAmount;
 
-            ModelState.Remove(nameof(sale.TotalAmount));
-            ModelState.Remove(nameof(sale.FinalAmount));
-
-            var isAjax = string.Equals(Request?.Headers["X-Requested-With"].ToString(), "XMLHttpRequest", StringComparison.Ordinal);
-
-            if (ModelState.IsValid && productIds != null && productIds.Count > 0)
+            if (sale.CustomerId <= 0 || !await _context.Customers.AnyAsync(c => c.Id == sale.CustomerId))
             {
-                sale.SaleNumber = $"SALE-{DateTime.Now:yyyyMMddHHmmss}";
-                sale.SaleDate = DateTime.Now;
-                sale.CreatedAt = DateTime.Now;
-                sale.Status = "Completed";
-
-                for (int i = 0; i < productIds.Count; i++)
-                {
-                    var product = await _context.Products.FindAsync(productIds[i]);
-                    if (product == null || product.StockQuantity < quantities[i])
-                    {
-                        continue;
-                    }
-                    var saleItem = new SaleItem
-                    {
-                        ProductId = productIds[i],
-                        Quantity = quantities[i],
-                        UnitPrice = product.Price,
-                        TotalPrice = product.Price * quantities[i],
-                        CreatedAt = DateTime.Now
-                    };
-                    sale.SaleItems.Add(saleItem);
-
-                    product.StockQuantity -= quantities[i];
-                    _context.Products.Update(product);
-                }
-
-                _context.Sales.Add(sale);
-                await _context.SaveChangesAsync();
-
-                if (isAjax)
-                {
-                    return Json(new { success = true, redirectUrl = Url.Action(nameof(Sales)) });
-                }
-
-                return RedirectToAction(nameof(Sales));
+                ModelState.AddModelError(nameof(sale.CustomerId), "Geçerli bir müşteri seçin.");
             }
 
-            if (isAjax)
+            // Remove validation for server-side computed/assigned fields
+            ModelState.Remove(nameof(Sale.SaleNumber));
+            ModelState.Remove(nameof(Sale.TotalAmount));
+            ModelState.Remove(nameof(Sale.FinalAmount));
+            ModelState.Remove(nameof(Sale.Status));
+            ModelState.Remove(nameof(Sale.SaleDate));
+            ModelState.Remove(nameof(Sale.CreatedAt));
+
+            if (isAjax && !ModelState.IsValid)
             {
                 var errors = ModelState
                     .Where(x => x.Value?.Errors.Count > 0)
-                    .SelectMany(x => x.Value!.Errors.Select(e => new
-                    {
-                        field = x.Key,
-                        message = string.IsNullOrEmpty(e.ErrorMessage) ? "Bu alan geçersiz." : e.ErrorMessage
-                    }))
+                    .SelectMany(x => x.Value!.Errors.Select(e => new { field = x.Key, message = string.IsNullOrEmpty(e.ErrorMessage) ? "Bu alan geçersiz." : e.ErrorMessage }))
                     .ToList();
-
                 var distinctMessages = errors.Select(e => e.message).Distinct().Take(10).ToList();
                 var mainMessage = distinctMessages.Count > 0 ? "Lütfen şu hataları düzeltin: " + string.Join(", ", distinctMessages) : "Lütfen form hatalarını düzeltin.";
-
                 return Json(new { success = false, message = mainMessage, errors });
             }
 
-            ViewBag.Customers = await _context.Customers.ToListAsync();
-            ViewBag.Products = await _context.Products.Where(p => p.IsActive && p.StockQuantity > 0).ToListAsync();
-            return View(sale);
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Customers = await _context.Customers.ToListAsync();
+                ViewBag.Products = await _context.Products.Where(p => p.IsActive && p.StockQuantity > 0).ToListAsync();
+                return View(sale);
+            }
+
+            // Build sale and sale items
+            sale.SaleNumber = $"SALE-{DateTime.Now:yyyyMMddHHmmss}";
+            sale.SaleDate = DateTime.Now;
+            sale.CreatedAt = DateTime.Now;
+            sale.Status = "Completed";
+
+            if (productIds != null && quantities != null)
+            {
+                for (int i = 0; i < productIds.Count; i++)
+                {
+                    var product = await _context.Products.FindAsync(productIds[i]);
+                    if (product == null) continue;
+                    var qty = quantities[i];
+                    if (qty <= 0 || product.StockQuantity < qty) continue;
+
+                    var saleItem = new SaleItem
+                    {
+                        ProductId = productIds[i],
+                        Quantity = qty,
+                        UnitPrice = product.Price,
+                        TotalPrice = product.Price * qty,
+                        CreatedAt = DateTime.Now
+                    };
+                    sale.SaleItems.Add(saleItem);
+                    product.StockQuantity -= qty;
+                    _context.Products.Update(product);
+                }
+            }
+
+            if (!sale.SaleItems.Any())
+            {
+                var msg = "Geçerli bir satış kalemi yok. Lütfen ürün ve adet girin.";
+                if (isAjax)
+                {
+                    return Json(new { success = false, message = msg, errors = new[] { new { field = "", message = msg } } });
+                }
+                ModelState.AddModelError(string.Empty, msg);
+                ViewBag.Customers = await _context.Customers.ToListAsync();
+                ViewBag.Products = await _context.Products.Where(p => p.IsActive && p.StockQuantity > 0).ToListAsync();
+                return View(sale);
+            }
+
+            _context.Sales.Add(sale);
+            var changes = await _context.SaveChangesAsync();
+            _logger.LogInformation("CreateSale saved changes: {Changes}", changes);
+
+            if (isAjax)
+            {
+                return Json(new { success = true, message = "Satış başarıyla oluşturuldu.", redirectUrl = Url.Action(nameof(Sales)) });
+            }
+            return RedirectToAction(nameof(Confirmation), new { message = "Satış başarıyla oluşturuldu.", returnUrl = Url.Action(nameof(Sales)) });
         }
 
         // Helper methods

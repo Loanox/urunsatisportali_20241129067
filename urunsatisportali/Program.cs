@@ -3,8 +3,10 @@ using urunsatisportali.Data;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Net.Http.Headers;
+using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 #if DEBUG
@@ -65,26 +67,37 @@ app.UseRequestLocalization(app.Services.GetRequiredService<Microsoft.Extensions.
 
 app.UseHttpsRedirection();
 
-// Enforce CSP headers (avoid unsafe-eval; allow required CDNs)
+// Generate CSP nonce per request and enforce CSP
 app.Use(async (context, next) =>
 {
-    var csp = string.Join("; ", new[]
+    // Generate base64 nonce
+    var nonceBytes = RandomNumberGenerator.GetBytes(16);
+    var nonce = Convert.ToBase64String(nonceBytes);
+    context.Items["CSPNonce"] = nonce;
+
+    var scriptSrc = app.Environment.IsDevelopment()
+        ? $"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}' 'unsafe-eval'"
+        : $"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}'";
+
+    var cspDirectives = new List<string>
     {
         "default-src 'self'",
-        // Only load scripts from self and jsdelivr CDN; disallow eval
-        "script-src 'self' https://cdn.jsdelivr.net",
+        scriptSrc,
         // Styles from self and jsdelivr CDN (inline allowed due to existing inline styles)
         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
         // Fonts from self and jsdelivr CDN
         "font-src 'self' https://cdn.jsdelivr.net",
         // Images
         "img-src 'self' data:",
+        // Allow websocket and HTTP(S) connects to localhost for dev tooling/browser refresh
+        "connect-src 'self' https://localhost:* http://localhost:* wss://localhost:* ws://localhost:*",
         // Block object/embed
         "object-src 'none'",
         // Base URI
         "base-uri 'self'"
-    });
-    context.Response.Headers["Content-Security-Policy"] = csp;
+    };
+
+    context.Response.Headers["Content-Security-Policy"] = string.Join("; ", cspDirectives);
 
     await next();
 });
