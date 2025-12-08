@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using urunsatisportali.Data;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,22 @@ builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 #else
 builder.Services.AddControllersWithViews();
 #endif
+
+// Localization options
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { new CultureInfo("tr-TR"), new CultureInfo("en-US") };
+    options.DefaultRequestCulture = new RequestCulture("tr-TR");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
+
+// Cookie policy (can be expanded if using Auth cookies)
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+    options.Secure = CookieSecurePolicy.Always;
+});
 
 // Add Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -41,11 +60,89 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Use localization with Turkish as default
+app.UseRequestLocalization(app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<RequestLocalizationOptions>>().Value);
+
 app.UseHttpsRedirection();
+
+// Enforce CSP headers (avoid unsafe-eval; allow required CDNs)
+app.Use(async (context, next) =>
+{
+    var csp = string.Join("; ", new[]
+    {
+        "default-src 'self'",
+        // Only load scripts from self and jsdelivr CDN; disallow eval
+        "script-src 'self' https://cdn.jsdelivr.net",
+        // Styles from self and jsdelivr CDN (inline allowed due to existing inline styles)
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+        // Fonts from self and jsdelivr CDN
+        "font-src 'self' https://cdn.jsdelivr.net",
+        // Images
+        "img-src 'self' data:",
+        // Block object/embed
+        "object-src 'none'",
+        // Base URI
+        "base-uri 'self'"
+    });
+    context.Response.Headers["Content-Security-Policy"] = csp;
+
+    await next();
+});
+
+// Ensure responses declare UTF-8 charset for text/html (fix Turkish characters)
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(state =>
+    {
+        var httpContext = (HttpContext)state!;
+        var ct = httpContext.Response.ContentType;
+        if (string.IsNullOrEmpty(ct))
+        {
+            httpContext.Response.ContentType = "text/html; charset=utf-8";
+        }
+        else if (ct.StartsWith("text/html", StringComparison.OrdinalIgnoreCase) && !ct.Contains("charset", StringComparison.OrdinalIgnoreCase))
+        {
+            httpContext.Response.ContentType = ct + "; charset=utf-8";
+        }
+        return Task.CompletedTask;
+    }, context);
+
+    await next();
+});
+
+// Harden cookies: append Secure and SameSite=Lax for non-auth custom cookies
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        var setCookieHeaders = context.Response.Headers[HeaderNames.SetCookie];
+        if (!string.IsNullOrEmpty(setCookieHeaders))
+        {
+            var modified = new Microsoft.Extensions.Primitives.StringValues(
+                setCookieHeaders.Select(h =>
+                {
+                    var val = h;
+                    if (string.IsNullOrEmpty(val))
+                    {
+                        return string.Empty;
+                    }
+                    if (!val.Contains("SameSite", StringComparison.OrdinalIgnoreCase))
+                        val += "; SameSite=Lax";
+                    if (!val.Contains("Secure", StringComparison.OrdinalIgnoreCase))
+                        val += "; Secure";
+                    return val;
+                }).ToArray());
+            context.Response.Headers[HeaderNames.SetCookie] = modified;
+        }
+        return Task.CompletedTask;
+    });
+
+    await next();
+});
+
 app.UseStaticFiles();
-
+app.UseCookiePolicy();
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(

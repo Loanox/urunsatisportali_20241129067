@@ -6,12 +6,12 @@ namespace urunsatisportali.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Customer name is required")]
+        [Required(ErrorMessage = "Müþteri adý gereklidir")]
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(100)]
-        [EmailAddress(ErrorMessage = "Invalid email address")]
+        [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz")]
         public string? Email { get; set; }
 
         [StringLength(20)]

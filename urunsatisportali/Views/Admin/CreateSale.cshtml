@@ -1,83 +1,81 @@
 @model urunsatisportali.Models.Sale
 @{
-    ViewData["Title"] = "Create Sale";
+    ViewData["Title"] = "Yeni Satýþ Oluþtur";
     Layout = "_AdminLayout";
 }
 
 <div class="page-header">
-    <h2><i class="bi bi-plus-circle"></i> Create New Sale</h2>
+    <h2><i class="bi bi-plus-circle"></i> Yeni Satýþ Oluþtur</h2>
 </div>
 
 <div class="card">
     <div class="card-body">
-        <form asp-action="CreateSale" method="post" id="saleForm">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <form id="saleForm" method="post">
+            @Html.AntiForgeryToken()
+            <div id="formAlert" class="alert d-none" role="alert"></div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label asp-for="CustomerId" class="form-label">Customer *</label>
-                    <select asp-for="CustomerId" class="form-select" required>
-                        <option value="">Select Customer</option>
+                    <label for="CustomerId" class="form-label">Müþteri *</label>
+                    <select id="CustomerId" name="CustomerId" class="form-select" required>
+                        <option value="">Müþteri Seçin</option>
                         @foreach (var customer in (List<urunsatisportali.Models.Customer>)ViewBag.Customers)
                         {
                             <option value="@customer.Id">@customer.Name</option>
                         }
                     </select>
-                    <span asp-validation-for="CustomerId" class="text-danger"></span>
+                    <span id="CustomerIdError" class="text-danger"></span>
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="Discount" class="form-label">Discount</label>
-                    <input asp-for="Discount" type="number" step="0.01" class="form-control" value="0" />
-                    <span asp-validation-for="Discount" class="text-danger"></span>
+                    <label for="Discount" class="form-label">Ýndirim (%)</label>
+                    <input id="Discount" name="Discount" type="number" step="0.01" class="form-control" value="0" />
+                    <span id="DiscountError" class="text-danger"></span>
                 </div>
 
                 <div class="col-md-3">
-                    <label asp-for="Tax" class="form-label">Tax</label>
-                    <input asp-for="Tax" type="number" step="0.01" class="form-control" value="0" />
-                    <span asp-validation-for="Tax" class="text-danger"></span>
+                    <label for="Tax" class="form-label">Vergi (%)</label>
+                    <input id="Tax" name="Tax" type="number" step="0.01" class="form-control" value="0" />
+                    <span id="TaxError" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Notes" class="form-label">Notes</label>
-                <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
-                <span asp-validation-for="Notes" class="text-danger"></span>
+                <label for="Notes" class="form-label">Notlar</label>
+                <textarea id="Notes" name="Notes" class="form-control" rows="2"></textarea>
+                <span id="NotesError" class="text-danger"></span>
             </div>
 
             <hr />
 
-            <h5>Sale Items</h5>
+            <h5>Ürün Ekle</h5>
             <div id="saleItems">
                 <div class="row mb-2 sale-item">
-                    <div class="col-md-5">
+                    <div class="col-md-6">
                         <select name="productIds" class="form-select product-select" required>
-                            <option value="">Select Product</option>
+                            <option value="">Ürün Seçin</option>
                             @foreach (var product in (List<urunsatisportali.Models.Product>)ViewBag.Products)
                             {
-                                <option value="@product.Id" data-price="@product.Price" data-stock="@product.StockQuantity">
-                                    @product.Name - @product.Price.ToString("C") (Stock: @product.StockQuantity)
+                                <option value="@product.Id" data-price="@product.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-stock="@product.StockQuantity">
+                                    @product.Name - @product.Price.ToString("C") (Stok: @product.StockQuantity)
                                 </option>
                             }
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <input type="number" name="quantities" class="form-control quantity-input" placeholder="Qty" min="1" required />
+                    <div class="col-md-3">
+                        <input type="number" name="quantities" class="form-control quantity-input" placeholder="Adet" min="1" required />
                     </div>
                     <div class="col-md-2">
-                        <input type="number" name="unitPrices" class="form-control price-input" step="0.01" placeholder="Price" required />
-                    </div>
-                    <div class="col-md-2">
-                        <input type="text" class="form-control item-total" readonly placeholder="Total" />
+                        <input type="text" class="form-control item-total" readonly placeholder="Toplam" />
                     </div>
                     <div class="col-md-1">
-                        <button type="button" class="btn btn-danger remove-item"><i class="bi bi-trash"></i></button>
+                        <button type="button" class="btn btn-danger remove-item" title="Kaldýr"><i class="bi bi-trash"></i></button>
                     </div>
                 </div>
             </div>
 
             <button type="button" class="btn btn-secondary mb-3" id="addItem">
-                <i class="bi bi-plus-circle"></i> Add Item
+                <i class="bi bi-plus-circle"></i> Ürün Ekle
             </button>
 
             <hr />
@@ -86,16 +84,16 @@
                 <div class="col-md-6">
                     <div class="card bg-light">
                         <div class="card-body">
-                            <h6>Sale Summary</h6>
+                            <h6>Satýþ Özeti</h6>
                             <dl class="row mb-0">
-                                <dt class="col-sm-6">Subtotal:</dt>
-                                <dd class="col-sm-6" id="subtotal">$0.00</dd>
-                                <dt class="col-sm-6">Discount:</dt>
-                                <dd class="col-sm-6" id="discount">$0.00</dd>
-                                <dt class="col-sm-6">Tax:</dt>
-                                <dd class="col-sm-6" id="tax">$0.00</dd>
-                                <dt class="col-sm-6"><strong>Total:</strong></dt>
-                                <dd class="col-sm-6"><strong id="total">$0.00</strong></dd>
+                                <dt class="col-sm-6">Ara Toplam (Vergisiz):</dt>
+                                <dd class="col-sm-6" id="subtotal">?0.00</dd>
+                                <dt class="col-sm-6">Vergi (%):</dt>
+                                <dd class="col-sm-6" id="taxAmount">?0.00</dd>
+                                <dt class="col-sm-6">Ýndirim (%):</dt>
+                                <dd class="col-sm-6" id="discount">?0.00</dd>
+                                <dt class="col-sm-6"><strong>Genel Toplam:</strong></dt>
+                                <dd class="col-sm-6"><strong id="total">?0.00</strong></dd>
                             </dl>
                         </div>
                     </div>
@@ -103,8 +101,11 @@
             </div>
 
             <div class="d-flex justify-content-between mt-3">
-                <a asp-action="Sales" class="btn btn-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Create Sale</button>
+                <a asp-action="Sales" class="btn btn-secondary">Ýptal</a>
+                <button type="button" id="submitSale" class="btn btn-primary">
+                    <span class="spinner-border spinner-border-sm d-none" id="submitSpinner" role="status" aria-hidden="true"></span>
+                    <span id="submitText">Satýþý Oluþtur</span>
+                </button>
             </div>
         </form>
     </div>
@@ -114,65 +115,111 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $(document).ready(function() {
-            // Add new item row
+            function recalcItem(item) {
+                var qty = parseFloat(item.find('.quantity-input').val()) || 0;
+                var price = parseFloat(item.find('.product-select option:selected').data('price')) || 0;
+                var total = qty * price;
+                item.find('.item-total').val(total.toFixed(2));
+                recalcTotals();
+            }
+
+            function recalcTotals() {
+                var subtotal = 0;
+                $('.item-total').each(function() { subtotal += parseFloat($(this).val()) || 0; });
+                var taxPercent = parseFloat($('#Tax').val()) || 0;
+                var discountPercent = parseFloat($('#Discount').val()) || 0;
+                var taxAmount = subtotal * (taxPercent / 100.0);
+                var discountAmount = subtotal * (discountPercent / 100.0);
+                var total = subtotal + taxAmount - discountAmount;
+                $('#subtotal').text('?' + subtotal.toFixed(2));
+                $('#taxAmount').text('?' + taxAmount.toFixed(2));
+                $('#discount').text('?' + discountAmount.toFixed(2));
+                $('#total').text('?' + total.toFixed(2));
+            }
+
             $('#addItem').click(function() {
                 var newItem = $('.sale-item').first().clone();
-                newItem.find('input, select').val('');
+                newItem.find('input').val('');
+                newItem.find('select').val('');
                 newItem.find('.item-total').val('');
                 $('#saleItems').append(newItem);
+                recalcTotals();
             });
 
-            // Remove item row
             $(document).on('click', '.remove-item', function() {
-                if ($('.sale-item').length > 1) {
-                    $(this).closest('.sale-item').remove();
-                    calculateTotal();
-                }
+                if ($('.sale-item').length > 1) { $(this).closest('.sale-item').remove(); recalcTotals(); }
             });
 
-            // Product selection - auto-fill price
-            $(document).on('change', '.product-select', function() {
-                var selectedOption = $(this).find('option:selected');
-                var price = selectedOption.data('price');
-                var stock = selectedOption.data('stock');
-                $(this).closest('.sale-item').find('.price-input').val(price);
-                $(this).closest('.sale-item').find('.quantity-input').attr('max', stock);
-                calculateItemTotal($(this).closest('.sale-item'));
-            });
+            $(document).on('change', '.product-select', function() { recalcItem($(this).closest('.sale-item')); });
+            $(document).on('input', '.quantity-input, #Discount, #Tax', function() { recalcTotals(); });
 
-            // Calculate item total
-            $(document).on('input', '.quantity-input, .price-input', function() {
-                calculateItemTotal($(this).closest('.sale-item'));
-            });
-
-            // Calculate discount and tax
-            $(document).on('input', '#Discount, #Tax', function() {
-                calculateTotal();
-            });
-
-            function calculateItemTotal(item) {
-                var quantity = parseFloat(item.find('.quantity-input').val()) || 0;
-                var price = parseFloat(item.find('.price-input').val()) || 0;
-                var total = quantity * price;
-                item.find('.item-total').val(total.toFixed(2));
-                calculateTotal();
+            function setSubmitting(state) {
+                if (state) { $('#submitSale').prop('disabled', true); $('#submitSpinner').removeClass('d-none'); $('#submitText').text('Gönderiliyor...'); }
+                else { $('#submitSale').prop('disabled', false); $('#submitSpinner').addClass('d-none'); $('#submitText').text('Satýþý Oluþtur'); }
             }
 
-            function calculateTotal() {
-                var subtotal = 0;
-                $('.item-total').each(function() {
-                    subtotal += parseFloat($(this).val()) || 0;
+            function collectItems() {
+                var seen = {};
+                var items = { productIds: [], quantities: [] };
+                $('.sale-item').each(function() {
+                    var p = $(this).find('select[name="productIds"]').val();
+                    var q = $(this).find('.quantity-input').val();
+                    if (!p) return; // skip empty row
+                    if (seen[p]) return; // skip duplicates
+                    seen[p] = true;
+                    items.productIds.push(parseInt(p));
+                    items.quantities.push(parseInt(q) || 0);
                 });
-
-                var discount = parseFloat($('#Discount').val()) || 0;
-                var tax = parseFloat($('#Tax').val()) || 0;
-                var total = subtotal - discount + tax;
-
-                $('#subtotal').text('$' + subtotal.toFixed(2));
-                $('#discount').text('$' + discount.toFixed(2));
-                $('#tax').text('$' + tax.toFixed(2));
-                $('#total').text('$' + total.toFixed(2));
+                return items;
             }
+
+            $('#submitSale').click(function() {
+                $('#formAlert').addClass('d-none').removeClass('alert-danger alert-success').text('');
+                $('.text-danger').text('');
+
+                var token = $('input[name="__RequestVerificationToken"]').val();
+                var items = collectItems();
+
+                var data = {
+                    __RequestVerificationToken: token,
+                    CustomerId: $('#CustomerId').val(),
+                    Discount: parseFloat($('#Discount').val()) || 0, // percent
+                    Tax: parseFloat($('#Tax').val()) || 0, // percent
+                    Notes: $('#Notes').val(),
+                    productIds: items.productIds,
+                    quantities: items.quantities
+                };
+
+                if (items.productIds.length === 0) {
+                    $('#formAlert').removeClass('d-none').addClass('alert-danger').text('Lütfen en az bir ürün ekleyin.');
+                    return;
+                }
+
+                setSubmitting(true);
+
+                $.ajax({
+                    url: '@Url.Action("CreateSale", "Admin")',
+                    method: 'POST',
+                    data: data,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function(resp) {
+                        if (resp.success) {
+                            $('#formAlert').removeClass('d-none').addClass('alert-success').text('Satýþ oluþturuldu. Yönlendiriliyorsunuz...');
+                            window.location = resp.redirectUrl;
+                        } else {
+                            $('#formAlert').removeClass('d-none').addClass('alert-danger').text(resp.message || 'Hata oluþtu.');
+                            if (resp.errors && resp.errors.length) {
+                                resp.errors.forEach(function(e) {
+                                    var key = e.field.replace('sale.', '').replace('Sale.', '').replace('__', '');
+                                    if (key && $('#' + key + 'Error').length) { $('#' + key + 'Error').text(e.message); }
+                                });
+                            }
+                            setSubmitting(false);
+                        }
+                    },
+                    error: function() { $('#formAlert').removeClass('d-none').addClass('alert-danger').text('Sunucu hatasý oluþtu.'); setSubmitting(false); }
+                });
+            });
         });
     </script>
 }

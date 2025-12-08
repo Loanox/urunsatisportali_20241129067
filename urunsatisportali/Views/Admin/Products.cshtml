@@ -60,7 +60,7 @@
                             <td>@product.Id</td>
                             <td>@product.Name</td>
                             <td>@product.SKU</td>
-                            <td>@product.Category.Name</td>
+                            <td>@(product.Category?.Name ?? "Kategori yok")</td>
                             <td>@CurrencyHelper.FormatTurkishLira(product.Price)</td>
                             <td>
                                 <span class="badge @(product.StockQuantity < 10 ? "bg-warning" : "bg-success")">

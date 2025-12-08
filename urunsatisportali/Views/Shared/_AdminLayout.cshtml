@@ -1,24 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Yönetim Paneli</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
     <style>
-        :root {
-            --sidebar-width: 250px;
-            --primary-color: #4f46e5;
-            --sidebar-bg: #1e293b;
-            --sidebar-hover: #334155;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fafc;
-        }
+        :root { --sidebar-width:250px; --primary-color:#4f46e5; --sidebar-bg:#1e293b; --sidebar-hover:#334155; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', 'DejaVu Sans', sans-serif; background-color:#f8fafc; }
 
         .sidebar {
             position: fixed;
@@ -170,7 +162,7 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <h4><i class="bi bi-shop"></i> Yönetim Paneli</h4>
-            @if (Context.Request.Cookies.ContainsKey("Username"))
+            @if (Context?.Request?.Cookies != null && Context.Request.Cookies.ContainsKey("Username"))
             {
                 <small class="text-white-50">@Context.Request.Cookies["Username"]</small>
             }

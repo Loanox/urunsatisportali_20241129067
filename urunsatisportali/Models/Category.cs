@@ -6,7 +6,7 @@ namespace urunsatisportali.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Category name is required")]
+        [Required(ErrorMessage = "Kategori adý gereklidir")]
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 

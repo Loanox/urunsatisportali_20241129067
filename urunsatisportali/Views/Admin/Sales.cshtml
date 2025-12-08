@@ -1,13 +1,13 @@
 @model IEnumerable<urunsatisportali.Models.Sale>
 @{
-    ViewData["Title"] = "Sales";
+    ViewData["Title"] = "Satýþlar";
     Layout = "_AdminLayout";
 }
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h2><i class="bi bi-cart-check"></i> Sales</h2>
+    <h2><i class="bi bi-cart-check"></i> Satýþlar</h2>
     <a asp-action="CreateSale" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Create New Sale
+        <i class="bi bi-plus-circle"></i> Yeni Satýþ Oluþtur
     </a>
 </div>
 
@@ -15,21 +15,21 @@
     <div class="card-header">
         <form method="get" class="row g-3">
             <div class="col-md-5">
-                <input type="text" name="searchString" class="form-control" placeholder="Search by sale number or customer..." value="@ViewContext.HttpContext.Request.Query["searchString"]" />
+                <input type="text" name="searchString" class="form-control" placeholder="Satýþ numarasý veya müþteri ara..." value="@ViewContext.HttpContext.Request.Query["searchString"]" />
             </div>
             <div class="col-md-3">
                 <select name="status" class="form-select">
-                    <option value="">All Statuses</option>
-                    <option value="Pending" selected="@(ViewContext.HttpContext.Request.Query["status"].ToString() == "Pending")">Pending</option>
-                    <option value="Completed" selected="@(ViewContext.HttpContext.Request.Query["status"].ToString() == "Completed")">Completed</option>
-                    <option value="Cancelled" selected="@(ViewContext.HttpContext.Request.Query["status"].ToString() == "Cancelled")">Cancelled</option>
+                    <option value="">Tüm Durumlar</option>
+                    <option value="Pending" selected="@(ViewContext.HttpContext.Request.Query["status"].ToString() == "Pending")">Beklemede</option>
+                    <option value="Completed" selected="@(ViewContext.HttpContext.Request.Query["status"].ToString() == "Completed")">Tamamlandý</option>
+                    <option value="Cancelled" selected="@(ViewContext.HttpContext.Request.Query["status"].ToString() == "Cancelled")">Ýptal</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Search</button>
+                <button type="submit" class="btn btn-primary w-100">Ara</button>
             </div>
             <div class="col-md-2">
-                <a asp-action="Sales" class="btn btn-outline-secondary w-100">Clear</a>
+                <a asp-action="Sales" class="btn btn-outline-secondary w-100">Temizle</a>
             </div>
         </form>
     </div>
@@ -38,14 +38,14 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Sale #</th>
-                        <th>Customer</th>
-                        <th>Total Amount</th>
-                        <th>Discount</th>
-                        <th>Final Amount</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Actions</th>
+                        <th>Satýþ #</th>
+                        <th>Müþteri</th>
+                        <th>Toplam</th>
+                        <th>Ýndirim</th>
+                        <th>Net</th>
+                        <th>Durum</th>
+                        <th>Tarih</th>
+                        <th>Ýþlemler</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,21 +60,21 @@
                             <td>
                                 @if (sale.Status == "Completed")
                                 {
-                                    <span class="badge bg-success">@sale.Status</span>
+                                    <span class="badge bg-success">Tamamlandý</span>
                                 }
                                 else if (sale.Status == "Pending")
                                 {
-                                    <span class="badge bg-warning">@sale.Status</span>
+                                    <span class="badge bg-warning">Beklemede</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-danger">@sale.Status</span>
+                                    <span class="badge bg-danger">Ýptal</span>
                                 }
                             </td>
-                            <td>@sale.SaleDate.ToString("MM/dd/yyyy HH:mm")</td>
+                            <td>@sale.SaleDate.ToString("dd.MM.yyyy HH:mm")</td>
                             <td>
                                 <a asp-action="SaleDetails" asp-route-id="@sale.Id" class="btn btn-sm btn-info">
-                                    <i class="bi bi-eye"></i> Details
+                                    <i class="bi bi-eye"></i> Detaylar
                                 </a>
                             </td>
                         </tr>

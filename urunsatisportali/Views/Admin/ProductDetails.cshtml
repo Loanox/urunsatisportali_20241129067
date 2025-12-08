@@ -1,16 +1,16 @@
 @model urunsatisportali.Models.Product
 @{
-    ViewData["Title"] = "Product Details";
+    ViewData["Title"] = "Ürün Detaylarý";
     Layout = "_AdminLayout";
 }
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h2><i class="bi bi-info-circle"></i> Product Details</h2>
+    <h2><i class="bi bi-info-circle"></i> Ürün Detaylarý</h2>
     <div>
         <a asp-action="EditProduct" asp-route-id="@Model.Id" class="btn btn-warning">
-            <i class="bi bi-pencil"></i> Edit
+            <i class="bi bi-pencil"></i> Düzenle
         </a>
-        <a asp-action="Products" class="btn btn-secondary">Back to List</a>
+        <a asp-action="Products" class="btn btn-secondary">Listeye Dön</a>
     </div>
 </div>
 
@@ -18,60 +18,60 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Product Information</h5>
+                <h5 class="mb-0">Ürün Bilgileri</h5>
             </div>
             <div class="card-body">
                 <dl class="row">
                     <dt class="col-sm-3">ID:</dt>
                     <dd class="col-sm-9">@Model.Id</dd>
 
-                    <dt class="col-sm-3">Name:</dt>
+                    <dt class="col-sm-3">Ad:</dt>
                     <dd class="col-sm-9">@Model.Name</dd>
 
                     <dt class="col-sm-3">SKU:</dt>
                     <dd class="col-sm-9">@Model.SKU</dd>
 
-                    <dt class="col-sm-3">Category:</dt>
-                    <dd class="col-sm-9">@Model.Category.Name</dd>
+                    <dt class="col-sm-3">Kategori:</dt>
+                    <dd class="col-sm-9">@(Model.Category?.Name ?? "Kategori yok")</dd>
 
-                    <dt class="col-sm-3">Description:</dt>
+                    <dt class="col-sm-3">Açýklama:</dt>
                     <dd class="col-sm-9">@(Model.Description ?? "N/A")</dd>
 
-                    <dt class="col-sm-3">Price:</dt>
+                    <dt class="col-sm-3">Fiyat:</dt>
                     <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
 
-                    <dt class="col-sm-3">Stock Quantity:</dt>
+                    <dt class="col-sm-3">Stok Miktarý:</dt>
                     <dd class="col-sm-9">
                         <span class="badge @(Model.StockQuantity < 10 ? "bg-warning" : "bg-success")">
                             @Model.StockQuantity @Model.Unit
                         </span>
                     </dd>
 
-                    <dt class="col-sm-3">Brand:</dt>
+                    <dt class="col-sm-3">Marka:</dt>
                     <dd class="col-sm-9">@(Model.Brand ?? "N/A")</dd>
 
-                    <dt class="col-sm-3">Unit:</dt>
+                    <dt class="col-sm-3">Birim:</dt>
                     <dd class="col-sm-9">@Model.Unit</dd>
 
-                    <dt class="col-sm-3">Status:</dt>
+                    <dt class="col-sm-3">Durum:</dt>
                     <dd class="col-sm-9">
                         @if (Model.IsActive)
                         {
-                            <span class="badge bg-success">Active</span>
+                            <span class="badge bg-success">Aktif</span>
                         }
                         else
                         {
-                            <span class="badge bg-secondary">Inactive</span>
+                            <span class="badge bg-secondary">Pasif</span>
                         }
                     </dd>
 
-                    <dt class="col-sm-3">Created At:</dt>
-                    <dd class="col-sm-9">@Model.CreatedAt.ToString("MM/dd/yyyy HH:mm")</dd>
+                    <dt class="col-sm-3">Oluþturulma:</dt>
+                    <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
 
                     @if (Model.UpdatedAt.HasValue)
                     {
-                        <dt class="col-sm-3">Updated At:</dt>
-                        <dd class="col-sm-9">@Model.UpdatedAt.Value.ToString("MM/dd/yyyy HH:mm")</dd>
+                        <dt class="col-sm-3">Güncellenme:</dt>
+                        <dd class="col-sm-9">@Model.UpdatedAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
                     }
                 </dl>
             </div>
