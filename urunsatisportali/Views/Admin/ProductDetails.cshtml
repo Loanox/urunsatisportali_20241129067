@@ -1,16 +1,16 @@
 @model urunsatisportali.Models.Product
 @{
-    ViewData["Title"] = "Ürün Detaylarý";
+    ViewData["Title"] = "ÃœrÃ¼n DetaylarÄ±";
     Layout = "_AdminLayout";
 }
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h2><i class="bi bi-info-circle"></i> Ürün Detaylarý</h2>
+    <h2><i class="bi bi-info-circle"></i> ÃœrÃ¼n DetaylarÄ±</h2>
     <div>
         <a asp-action="EditProduct" asp-route-id="@Model.Id" class="btn btn-warning">
-            <i class="bi bi-pencil"></i> Düzenle
+            <i class="bi bi-pencil"></i> DÃ¼zenle
         </a>
-        <a asp-action="Products" class="btn btn-secondary">Listeye Dön</a>
+        <a asp-action="Products" class="btn btn-secondary">Listeye DÃ¶n</a>
     </div>
 </div>
 
@@ -18,7 +18,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Ürün Bilgileri</h5>
+                <h5 class="mb-0">ÃœrÃ¼n Bilgileri</h5>
             </div>
             <div class="card-body">
                 <dl class="row">
@@ -34,13 +34,13 @@
                     <dt class="col-sm-3">Kategori:</dt>
                     <dd class="col-sm-9">@(Model.Category?.Name ?? "Kategori yok")</dd>
 
-                    <dt class="col-sm-3">Açýklama:</dt>
+                    <dt class="col-sm-3">AÃ§Ä±klama:</dt>
                     <dd class="col-sm-9">@(Model.Description ?? "N/A")</dd>
 
                     <dt class="col-sm-3">Fiyat:</dt>
                     <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
 
-                    <dt class="col-sm-3">Stok Miktarý:</dt>
+                    <dt class="col-sm-3">Stok MiktarÄ±:</dt>
                     <dd class="col-sm-9">
                         <span class="badge @(Model.StockQuantity < 10 ? "bg-warning" : "bg-success")">
                             @Model.StockQuantity @Model.Unit
@@ -65,12 +65,12 @@
                         }
                     </dd>
 
-                    <dt class="col-sm-3">Oluþturulma:</dt>
+                    <dt class="col-sm-3">OluÅŸturulma:</dt>
                     <dd class="col-sm-9">@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
 
                     @if (Model.UpdatedAt.HasValue)
                     {
-                        <dt class="col-sm-3">Güncellenme:</dt>
+                        <dt class="col-sm-3">GÃ¼ncellenme:</dt>
                         <dd class="col-sm-9">@Model.UpdatedAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
                     }
                 </dl>

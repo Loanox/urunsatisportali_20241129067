@@ -557,6 +557,12 @@ namespace urunsatisportali.Controllers
             sale.SaleItems ??= new List<SaleItem>();
             var isAjax = string.Equals(Request?.Headers["X-Requested-With"].ToString(), "XMLHttpRequest", StringComparison.Ordinal);
 
+            // Convert empty customer to null
+            if (sale.CustomerId.HasValue && sale.CustomerId.Value <= 0)
+            {
+                sale.CustomerId = null;
+            }
+
             if (productIds == null || productIds.Count == 0)
             {
                 ModelState.AddModelError(string.Empty, "Lütfen en az bir ürün seçin.");
@@ -601,11 +607,6 @@ namespace urunsatisportali.Controllers
             sale.TotalAmount = subtotal;
             sale.FinalAmount = subtotal + taxAmount - discountAmount;
 
-            if (sale.CustomerId <= 0 || !await _context.Customers.AnyAsync(c => c.Id == sale.CustomerId))
-            {
-                ModelState.AddModelError(nameof(sale.CustomerId), "Geçerli bir müşteri seçin.");
-            }
-
             // Remove validation for server-side computed/assigned fields
             ModelState.Remove(nameof(Sale.SaleNumber));
             ModelState.Remove(nameof(Sale.TotalAmount));
@@ -613,7 +614,9 @@ namespace urunsatisportali.Controllers
             ModelState.Remove(nameof(Sale.Status));
             ModelState.Remove(nameof(Sale.SaleDate));
             ModelState.Remove(nameof(Sale.CreatedAt));
+            ModelState.Remove(nameof(Sale.CustomerId)); // make optional
 
+            // AJAX error response
             if (isAjax && !ModelState.IsValid)
             {
                 var errors = ModelState
@@ -632,7 +635,6 @@ namespace urunsatisportali.Controllers
                 return View(sale);
             }
 
-            // Build sale and sale items
             sale.SaleNumber = $"SALE-{DateTime.Now:yyyyMMddHHmmss}";
             sale.SaleDate = DateTime.Now;
             sale.CreatedAt = DateTime.Now;

@@ -1,11 +1,11 @@
 @model urunsatisportali.Models.Category
 @{
-    ViewData["Title"] = "Kategori Oluþtur";
+    ViewData["Title"] = "Kategori OluÅŸtur";
     Layout = "_AdminLayout";
 }
 
 <div class="page-header">
-    <h2><i class="bi bi-plus-circle"></i> Yeni Kategori Oluþtur</h2>
+    <h2><i class="bi bi-plus-circle"></i> Yeni Kategori OluÅŸtur</h2>
 </div>
 
 <div class="card">
@@ -14,20 +14,20 @@
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="Name" class="form-label">Kategori Adý *</label>
+                <label asp-for="Name" class="form-label">Kategori AdÄ± *</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Description" class="form-label">Açýklama</label>
+                <label asp-for="Description" class="form-label">AÃ§Ä±klama</label>
                 <textarea asp-for="Description" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
             <div class="d-flex justify-content-between">
-                <a asp-action="Categories" class="btn btn-secondary">Ýptal</a>
-                <button type="submit" class="btn btn-primary">Kategori Oluþtur</button>
+                <a asp-action="Categories" class="btn btn-secondary">Ä°ptal</a>
+                <button type="submit" class="btn btn-primary">Kategori OluÅŸtur</button>
             </div>
         </form>
     </div>

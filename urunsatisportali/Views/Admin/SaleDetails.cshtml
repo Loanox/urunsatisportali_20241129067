@@ -1,42 +1,42 @@
 @model urunsatisportali.Models.Sale
 @{
-    ViewData["Title"] = "Satýþ Detaylarý";
+    ViewData["Title"] = "SatÄ±ÅŸ DetaylarÄ±";
     Layout = "_AdminLayout";
 }
 
 <div class="page-header d-flex justify-content-between align-items-center">
-    <h2><i class="bi bi-info-circle"></i> Satýþ Detaylarý</h2>
-    <a asp-action="Sales" class="btn btn-secondary">Satýþlara Dön</a>
+    <h2><i class="bi bi-info-circle"></i> SatÄ±ÅŸ DetaylarÄ±</h2>
+    <a asp-action="Sales" class="btn btn-secondary">SatÄ±ÅŸlara DÃ¶n</a>
 </div>
 
 <div class="row">
     <div class="col-md-8">
         <div class="card mb-3">
             <div class="card-header">
-                <h5 class="mb-0">Satýþ Bilgileri</h5>
+                <h5 class="mb-0">SatÄ±ÅŸ Bilgileri</h5>
             </div>
             <div class="card-body">
                 <dl class="row">
-                    <dt class="col-sm-4">Satýþ No:</dt>
+                    <dt class="col-sm-4">SatÄ±ÅŸ No:</dt>
                     <dd class="col-sm-8"><strong>@Model.SaleNumber</strong></dd>
 
-                    <dt class="col-sm-4">Müþteri:</dt>
+                    <dt class="col-sm-4">MÃ¼ÅŸteri:</dt>
                     <dd class="col-sm-8">@(Model.Customer?.Name ?? "N/A")</dd>
 
-                    <dt class="col-sm-4">Müþteri E-posta:</dt>
+                    <dt class="col-sm-4">MÃ¼ÅŸteri E-posta:</dt>
                     <dd class="col-sm-8">@(Model.Customer?.Email ?? "N/A")</dd>
 
-                    <dt class="col-sm-4">Müþteri Telefon:</dt>
+                    <dt class="col-sm-4">MÃ¼ÅŸteri Telefon:</dt>
                     <dd class="col-sm-8">@(Model.Customer?.Phone ?? "N/A")</dd>
 
-                    <dt class="col-sm-4">Satýþ Tarihi:</dt>
+                    <dt class="col-sm-4">SatÄ±ÅŸ Tarihi:</dt>
                     <dd class="col-sm-8">@Model.SaleDate.ToString("dd.MM.yyyy HH:mm")</dd>
 
                     <dt class="col-sm-4">Durum:</dt>
                     <dd class="col-sm-8">
                         @if (Model.Status == "Completed")
                         {
-                            <span class="badge bg-success">Tamamlandý</span>
+                            <span class="badge bg-success">TamamlandÄ±</span>
                         }
                         else if (Model.Status == "Pending")
                         {
@@ -44,7 +44,7 @@
                         }
                         else
                         {
-                            <span class="badge bg-danger">Ýptal</span>
+                            <span class="badge bg-danger">Ä°ptal</span>
                         }
                     </dd>
 
@@ -56,17 +56,17 @@
 
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Satýþ Kalemleri</h5>
+                <h5 class="mb-0">SatÄ±ÅŸ Kalemleri</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Ürün</th>
+                                <th>ÃœrÃ¼n</th>
                                 <th>Miktar</th>
                                 <th>Birim Fiyat</th>
-                                <th>Ýndirim</th>
+                                <th>Ä°ndirim</th>
                                 <th>Toplam</th>
                             </tr>
                         </thead>
@@ -88,7 +88,7 @@
                                 <th>@Model.TotalAmount.ToString("C")</th>
                             </tr>
                             <tr>
-                                <th colspan="4" class="text-end">Ýndirim:</th>
+                                <th colspan="4" class="text-end">Ä°ndirim:</th>
                                 <th>@Model.Discount.ToString("C")</th>
                             </tr>
                             <tr>

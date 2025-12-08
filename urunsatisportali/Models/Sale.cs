@@ -11,8 +11,8 @@ namespace urunsatisportali.Models
         [StringLength(50)]
         public string SaleNumber { get; set; } = string.Empty;
 
-        [Required]
-        public int CustomerId { get; set; }
+        // Customer is optional
+        public int? CustomerId { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
@@ -39,7 +39,7 @@ namespace urunsatisportali.Models
         public DateTime? UpdatedAt { get; set; }
 
         // Navigation properties
-        public virtual Customer Customer { get; set; } = null!;
+        public virtual Customer? Customer { get; set; }
         public virtual ICollection<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
     }
 }

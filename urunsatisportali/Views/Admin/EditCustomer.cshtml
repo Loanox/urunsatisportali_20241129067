@@ -1,11 +1,11 @@
 @model urunsatisportali.Models.Customer
 @{
-    ViewData["Title"] = "Müþteri Düzenle";
+    ViewData["Title"] = "MÃ¼ÅŸteri DÃ¼zenle";
     Layout = "_AdminLayout";
 }
 
 <div class="page-header">
-    <h2><i class="bi bi-pencil"></i> Müþteri Düzenle</h2>
+    <h2><i class="bi bi-pencil"></i> MÃ¼ÅŸteri DÃ¼zenle</h2>
 </div>
 
 <div class="card">
@@ -16,7 +16,7 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Name" class="form-label">Müþteri Adý *</label>
+                    <label asp-for="Name" class="form-label">MÃ¼ÅŸteri AdÄ± *</label>
                     <input asp-for="Name" class="form-control" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label asp-for="City" class="form-label">Þehir</label>
+                    <label asp-for="City" class="form-label">Åžehir</label>
                     <input asp-for="City" class="form-control" />
                     <span asp-validation-for="City" class="text-danger"></span>
                 </div>
@@ -56,15 +56,15 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Country" class="form-label">Ülke</label>
+                    <label asp-for="Country" class="form-label">Ãœlke</label>
                     <input asp-for="Country" class="form-control" />
                     <span asp-validation-for="Country" class="text-danger"></span>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between">
-                <a asp-action="Customers" class="btn btn-secondary">Ýptal</a>
-                <button type="submit" class="btn btn-primary">Müþteriyi Güncelle</button>
+                <a asp-action="Customers" class="btn btn-secondary">Ä°ptal</a>
+                <button type="submit" class="btn btn-primary">MÃ¼ÅŸteriyi GÃ¼ncelle</button>
             </div>
         </form>
     </div>
