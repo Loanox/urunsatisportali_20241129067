@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,7 @@ using urunsatisportali.Models;
 
 namespace urunsatisportali.Controllers
 {
+    [Authorize]
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,19 +17,6 @@ namespace urunsatisportali.Controllers
         {
             _context = context;
             _logger = logger;
-        }
-
-        private bool IsLoggedIn()
-        {
-            return Request?.Cookies?.ContainsKey("UserId") == true;
-        }
-
-        private void CheckAuthentication()
-        {
-            if (!IsLoggedIn())
-            {
-                Response.Redirect("/Auth/Login");
-            }
         }
 
         // Confirmation page
@@ -42,7 +31,6 @@ namespace urunsatisportali.Controllers
         // Dashboard
         public async Task<IActionResult> Dashboard()
         {
-            CheckAuthentication();
             var totalProducts = await _context.Products.CountAsync();
             var totalCustomers = await _context.Customers.CountAsync();
             var totalSales = await _context.Sales.CountAsync();
@@ -104,7 +92,6 @@ namespace urunsatisportali.Controllers
         [HttpGet]
         public async Task<IActionResult> CreateProduct()
         {
-            CheckAuthentication();
             var categories = await _context.Categories.ToListAsync();
             ViewBag.Categories = new SelectList(categories, "Id", "Name");
             return View();
@@ -180,7 +167,6 @@ namespace urunsatisportali.Controllers
         [HttpGet]
         public async Task<IActionResult> EditProduct(int id)
         {
-            CheckAuthentication();
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
@@ -196,8 +182,6 @@ namespace urunsatisportali.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProduct(int id, Product product)
         {
-            CheckAuthentication();
-
             if (id != product.Id)
             {
                 var xreq = Request?.Headers["X-Requested-With"].ToString();
@@ -688,11 +672,6 @@ namespace urunsatisportali.Controllers
         }
 
         // Helper methods
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
-        }
-
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.Id == id);

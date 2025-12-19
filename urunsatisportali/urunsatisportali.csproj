@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Views\Admin\CreateSale.txt" />
-    <Content Include="Views\Admin\Dashboard.txt" />
+    <Content Include="Views/Admin/CreateSale.txt" />
+    <Content Include="Views/Admin/Dashboard.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +17,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

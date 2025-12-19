@@ -4,6 +4,8 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Net.Http.Headers;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Identity;
+using urunsatisportali.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,31 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add ASP.NET Core Identity
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequiredLength = 6;
+        options.SignIn.RequireConfirmedAccount = false;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.LogoutPath = "/Auth/Logout";
+    options.AccessDeniedPath = "/Auth/Login";
+    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+});
+
 var app = builder.Build();
 
 // Apply pending migrations to ensure database is up to date
@@ -45,12 +72,45 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
+        await context.Database.MigrateAsync();
+
+        // Seed admin user and role
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        const string adminRole = "Admin";
+        if (!await roleManager.RoleExistsAsync(adminRole))
+        {
+            await roleManager.CreateAsync(new IdentityRole(adminRole));
+        }
+
+        var adminUser = await userManager.FindByNameAsync("admin");
+        if (adminUser == null)
+        {
+            adminUser = new ApplicationUser
+            {
+                UserName = "admin",
+                Email = "admin@example.com",
+                EmailConfirmed = true,
+                FullName = "Yönetici",
+                IsAdmin = true,
+                CreatedAt = DateTime.Now
+            };
+            await userManager.CreateAsync(adminUser, "admin123");
+            await userManager.AddToRoleAsync(adminUser, adminRole);
+        }
+        else
+        {
+            if (!await userManager.IsInRoleAsync(adminUser, adminRole))
+            {
+                await userManager.AddToRoleAsync(adminUser, adminRole);
+            }
+        }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database.");
+        logger.LogError(ex, "An error occurred while migrating the database or seeding Identity.");
     }
 }
 
@@ -156,6 +216,7 @@ app.Use(async (context, next) =>
 app.UseStaticFiles();
 app.UseCookiePolicy();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

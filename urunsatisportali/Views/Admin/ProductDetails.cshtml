@@ -1,4 +1,5 @@
 @model urunsatisportali.Models.Product
+@using urunsatisportali.Helpers
 @{
     ViewData["Title"] = "Ürün Detayları";
     Layout = "_AdminLayout";
@@ -38,7 +39,7 @@
                     <dd class="col-sm-9">@(Model.Description ?? "N/A")</dd>
 
                     <dt class="col-sm-3">Fiyat:</dt>
-                    <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
+                    <dd class="col-sm-9">@CurrencyHelper.FormatTurkishLira(Model.Price)</dd>
 
                     <dt class="col-sm-3">Stok Miktarı:</dt>
                     <dd class="col-sm-9">

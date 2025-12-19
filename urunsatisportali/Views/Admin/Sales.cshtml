@@ -1,4 +1,5 @@
 @model IEnumerable<urunsatisportali.Models.Sale>
+@using urunsatisportali.Helpers
 @{
     ViewData["Title"] = "Satışlar";
     Layout = "_AdminLayout";
@@ -54,9 +55,9 @@
                         <tr>
                             <td><strong>@sale.SaleNumber</strong></td>
                             <td>@(sale.Customer != null ? sale.Customer.Name : "-")</td>
-                            <td>@sale.TotalAmount.ToString("C")</td>
-                            <td>@sale.Discount.ToString("C")</td>
-                            <td><strong>@sale.FinalAmount.ToString("C")</strong></td>
+                            <td>@CurrencyHelper.FormatTurkishLira(sale.TotalAmount)</td>
+                            <td>@CurrencyHelper.FormatTurkishLira(sale.Discount)</td>
+                            <td><strong>@CurrencyHelper.FormatTurkishLira(sale.FinalAmount)</strong></td>
                             <td>
                                 @if (sale.Status == "Completed")
                                 {

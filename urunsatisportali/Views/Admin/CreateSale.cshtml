@@ -1,4 +1,5 @@
 @model urunsatisportali.Models.Sale
+@using urunsatisportali.Helpers
 @{
     ViewData["Title"] = "Yeni Satış";
     Layout = "_AdminLayout";
@@ -59,7 +60,7 @@
                             @foreach (var product in (List<urunsatisportali.Models.Product>)ViewBag.Products)
                             {
                                 <option value="@product.Id" data-price="@product.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-stock="@product.StockQuantity">
-                                    @product.Name - @product.Price.ToString("C") (Stok: @product.StockQuantity)
+                                    @product.Name - @CurrencyHelper.FormatTurkishLira(product.Price) (Stok: @product.StockQuantity)
                                 </option>
                             }
                         </select>
@@ -70,7 +71,7 @@
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Toplam</label>
-                        <input type="text" class="form-control item-total" readonly placeholder="0.00" />
+                        <input type="text" class="form-control item-total" readonly placeholder="0.00 ₺" />
                     </div>
                     <div class="col-md-1 d-flex align-items-end">
                         <button type="button" class="btn btn-danger remove-item" title="Kalemi kaldır"><i class="bi bi-trash3"></i></button>
@@ -89,13 +90,13 @@
                             <h6>Satış Özeti</h6>
                             <dl class="row mb-0">
                                 <dt class="col-sm-6">Ara Toplam</dt>
-                                <dd class="col-sm-6" id="subtotal">0.00</dd>
+                                <dd class="col-sm-6" id="subtotal">0.00 ₺</dd>
                                 <dt class="col-sm-6">Vergi</dt>
-                                <dd class="col-sm-6" id="taxAmount">0.00</dd>
+                                <dd class="col-sm-6" id="taxAmount">0.00 ₺</dd>
                                 <dt class="col-sm-6">İndirim</dt>
-                                <dd class="col-sm-6" id="discount">0.00</dd>
+                                <dd class="col-sm-6" id="discount">0.00 ₺</dd>
                                 <dt class="col-sm-6"><strong>Genel Toplam</strong></dt>
-                                <dd class="col-sm-6"><strong id="total">0.00</strong></dd>
+                                <dd class="col-sm-6"><strong id="total">0.00 ₺</strong></dd>
                             </dl>
                         </div>
                     </div>
@@ -121,13 +122,17 @@
                 var qty = parseFloat(item.find('.quantity-input').val()) || 0;
                 var price = parseFloat(item.find('.product-select option:selected').data('price')) || 0;
                 var total = qty * price;
-                item.find('.item-total').val(total.toFixed(2));
+                item.find('.item-total').val(total.toFixed(2) + ' ₺');
                 recalcTotals();
             }
-            function formatCurrency(v) { return v.toFixed(2); }
+            function formatCurrency(v) { return v.toFixed(2) + ' ₺'; }
             function recalcTotals() {
                 var subtotal = 0;
-                $('.item-total').each(function() { subtotal += parseFloat($(this).val()) || 0; });
+                $('.item-total').each(function() {
+                    var txt = $(this).val();
+                    var num = parseFloat(txt);
+                    subtotal += isNaN(num) ? 0 : num;
+                });
                 var taxPercent = parseFloat($('#Tax').val()) || 0;
                 var discountPercent = parseFloat($('#Discount').val()) || 0;
                 var taxAmount = subtotal * (taxPercent / 100.0);
@@ -142,7 +147,7 @@
                 var newItem = $('.sale-item').first().clone();
                 newItem.find('input').val('');
                 newItem.find('select').val('');
-                newItem.find('.item-total').val('0.00');
+                newItem.find('.item-total').val('0.00 ₺');
                 newItem.find('select.product-select').attr('name', 'productIds[]');
                 newItem.find('input.quantity-input').attr('name', 'quantities[]');
                 $('#saleItems').append(newItem);
