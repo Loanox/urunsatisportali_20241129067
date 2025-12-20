@@ -1,3 +1,4 @@
+@using urunsatisportali.Helpers
 @model urunsatisportali.Models.ViewModels.CartViewModel
 @{
     ViewData["Title"] = "Ödeme";
@@ -235,14 +236,14 @@
                                         <h5 class="fs-14"><a href="#" class="text-body">@item.ProductName</a></h5>
                                         <p class="text-muted mb-0">x @item.Quantity</p>
                                     </td>
-                                    <td class="text-end">@item.Total.ToString("C2")</td>
+                                    <td class="text-end">@CurrencyHelper.FormatTurkishLira(item.Total)</td>
                                 </tr>
                             }
                             <tr class="table-active">
                                 <th colspan="2">Toplam (TL) :</th>
                                 <td class="text-end">
                                     <span class="fw-semibold">
-                                        @Model.GrandTotal.ToString("C2")
+                                        @CurrencyHelper.FormatTurkishLira(Model.GrandTotal)
                                     </span>
                                 </td>
                             </tr>

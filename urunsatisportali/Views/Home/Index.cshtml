@@ -1,3 +1,4 @@
+@using urunsatisportali.Helpers
 @model List<urunsatisportali.Models.Product>
 @{
     ViewData["Title"] = "Ana Sayfa";
@@ -89,7 +90,7 @@
                 <div class="card-footer border-top border-top-dashed">
                     <div class="d-flex align-items-center">
                         <div class="flex-grow-1">
-                            <h5 class="text-primary mb-0">@item.Price.ToString("C2")</h5>
+                            <h5 class="text-primary mb-0">@CurrencyHelper.FormatTurkishLira(item.Price)</h5>
                         </div>
                         <div class="flex-shrink-0">
                             <i class="ri-star-fill text-warning align-bottom"></i> 5.0

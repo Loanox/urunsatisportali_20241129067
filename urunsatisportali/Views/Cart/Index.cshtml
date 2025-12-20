@@ -1,3 +1,4 @@
+@using urunsatisportali.Helpers
 @model urunsatisportali.Models.ViewModels.CartViewModel
 @{
     ViewData["Title"] = "Alışveriş Sepeti";
@@ -52,7 +53,7 @@
                                         class="text-body">@item.ProductName</a></h5>
                                 <ul class="list-inline text-muted">
                                     <li class="list-inline-item">Fiyat : <span
-                                            class="fw-medium">@item.Price.ToString("C2")</span></li>
+                                            class="fw-medium">@CurrencyHelper.FormatTurkishLira(item.Price)</span></li>
                                 </ul>
 
                                 <div class="input-step light">
@@ -68,7 +69,7 @@
                             <div class="col-sm-auto">
                                 <div class="text-lg-end">
                                     <p class="text-muted mb-1">Ürün Toplamı:</p>
-                                    <h5 class="fs-14">@item.Total.ToString("C2")</h5>
+                                    <h5 class="fs-14">@CurrencyHelper.FormatTurkishLira(item.Total)</h5>
                                 </div>
                             </div>
                         </div>
@@ -90,7 +91,8 @@
                             <div class="col-sm-auto">
                                 <div class="d-flex align-items-center gap-2 text-muted">
                                     <div>Toplam :</div>
-                                    <h5 class="fs-14 mb-0"><span class="product-line-price">@item.Total.ToString("C2")</span>
+                                    <h5 class="fs-14 mb-0"><span
+                                            class="product-line-price">@CurrencyHelper.FormatTurkishLira(item.Total)</span>
                                     </h5>
                                 </div>
                             </div>
@@ -127,7 +129,7 @@
                             <tbody>
                                 <tr>
                                     <td>Ara Toplam :</td>
-                                    <td class="text-end">@Model.GrandTotal.ToString("C2")</td>
+                                    <td class="text-end">@CurrencyHelper.FormatTurkishLira(Model.GrandTotal)</td>
                                 </tr>
                                 <tr>
                                     <td>Kargo Ücreti :</td>
@@ -137,7 +139,7 @@
                                     <th>Toplam (TL) :</th>
                                     <td class="text-end">
                                         <span class="fw-semibold">
-                                            @Model.GrandTotal.ToString("C2")
+                                            @CurrencyHelper.FormatTurkishLira(Model.GrandTotal)
                                         </span>
                                     </td>
                                 </tr>

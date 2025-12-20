@@ -1,3 +1,4 @@
+@using urunsatisportali.Helpers
 @model urunsatisportali.Models.Sale
 @{
     ViewData["Title"] = "Sipariş Detayı";
@@ -50,9 +51,9 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>@item.UnitPrice.ToString("C2")</td>
+                                    <td>@CurrencyHelper.FormatTurkishLira(item.UnitPrice)</td>
                                     <td>@item.Quantity</td>
-                                    <td class="text-end">@item.TotalPrice.ToString("C2")</td>
+                                    <td class="text-end">@CurrencyHelper.FormatTurkishLira(item.TotalPrice)</td>
                                 </tr>
                             }
                             <tr class="border-top border-top-dashed">
@@ -62,19 +63,22 @@
                                         <tbody>
                                             <tr>
                                                 <td>Ara Toplam :</td>
-                                                <td class="text-end">@Model.TotalAmount.ToString("C2")</td>
+                                                <td class="text-end">
+                                                    @CurrencyHelper.FormatTurkishLira(Model.TotalAmount)</td>
                                             </tr>
                                             <tr>
                                                 <td>Vergi :</td>
-                                                <td class="text-end">@Model.Tax.ToString("C2")</td>
+                                                <td class="text-end">@CurrencyHelper.FormatTurkishLira(Model.Tax)</td>
                                             </tr>
                                             <tr>
                                                 <td>İndirim :</td>
-                                                <td class="text-end">-@Model.Discount.ToString("C2")</td>
+                                                <td class="text-end">-@CurrencyHelper.FormatTurkishLira(Model.Discount)
+                                                </td>
                                             </tr>
                                             <tr class="border-top border-top-dashed">
                                                 <th scope="row">Genel Toplam :</th>
-                                                <th class="text-end">@Model.FinalAmount.ToString("C2")</th>
+                                                <th class="text-end">
+                                                    @CurrencyHelper.FormatTurkishLira(Model.FinalAmount)</th>
                                             </tr>
                                         </tbody>
                                     </table>

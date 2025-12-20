@@ -53,7 +53,7 @@
                                         }
                                     </td>
                                     <td>@item.SaleDate.ToString("g")</td>
-                                    <td>@item.FinalAmount.ToString("C2")</td>
+                                    <td>@CurrencyHelper.FormatTurkishLira(item.FinalAmount)</td>
                                     <td>
                                         @if (item.Status == "Completed")
                                         {
