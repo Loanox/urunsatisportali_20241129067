@@ -1,0 +1,60 @@
+@{
+    ViewData["Title"] = "Yeni Yönetici Ekle";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
+                <h4 class="mb-sm-0">Yeni Yönetici Ekle</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xxl-6 col-md-8">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Yönetici Bilgileri</h4>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @ViewBag.Error
+                        </div>
+                    }
+
+                    <form asp-action="CreateAdmin" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Ad Soyad</label>
+                            <input name="fullName" class="form-control" placeholder="Örn: Ali Yılmaz" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Kullanıcı Adı</label>
+                            <input name="username" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">E-Posta</label>
+                            <input name="email" type="email" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Şifre</label>
+                            <input name="password" type="password" class="form-control" required minlength="6" />
+                            <div class="form-text">En az 6 karakter olmalıdır.</div>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success waves-effect waves-light">Yönetici
+                                Oluştur</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+@model urunsatisportali.Models.ApplicationUser
+@using urunsatisportali.Helpers
+@{
+    ViewData["Title"] = "Profilim";
+    var sales = ViewBag.Sales as IEnumerable<urunsatisportali.Models.Sale>;
+}
+
+<div class="page-header mb-4">
+    <h2><i class="ri-user-line"></i> Profilim</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Bilgilerim</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Ad Soyad:</strong> @Model.FullName</li>
+                    <li class="list-group-item"><strong>Kullanıcı Adı:</strong> @Model.UserName</li>
+                    <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                    <li class="list-group-item"><strong>Telefon:</strong> @(Model.PhoneNumber ?? "-")</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Sipariş Geçmişim</h5>
+            </div>
+            <div class="card-body">
+                @if (sales != null && sales.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Sipariş No</th>
+                                    <th>Tarih</th>
+                                    <th>Tutar</th>
+                                    <th>Durum</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var sale in sales)
+                                {
+                                    <tr>
+                                        <td>@sale.SaleNumber</td>
+                                        <td>@sale.SaleDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@sale.FinalAmount.ToString("C2")</td>
+                                        <td>
+                                            @if (sale.Status == "Completed")
+                                            {
+                                                <span class="badge bg-success">Tamamlandı</span>
+                                            }
+                                            else if (sale.Status == "Pending")
+                                            {
+                                                <span class="badge bg-warning text-dark">Beklemede</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">@sale.Status</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="Checkout" asp-action="OrderConfirmation" asp-route-id="@sale.Id"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="ri-eye-line"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-4">Henüz siparişiniz bulunmuyor.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

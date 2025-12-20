@@ -248,6 +248,12 @@ namespace urunsatisportali.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -264,29 +270,37 @@ namespace urunsatisportali.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 12, 17, 17, 41, 14, 98, DateTimeKind.Local).AddTicks(4550),
+                            CreatedAt = new DateTime(2025, 12, 20, 18, 18, 4, 765, DateTimeKind.Local).AddTicks(4835),
                             Description = "Elektronik ürünler",
+                            IsActive = true,
+                            IsDeleted = false,
                             Name = "Elektronik"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 12, 17, 17, 41, 14, 98, DateTimeKind.Local).AddTicks(4552),
+                            CreatedAt = new DateTime(2025, 12, 20, 18, 18, 4, 765, DateTimeKind.Local).AddTicks(4836),
                             Description = "Giyim ve aksesuar",
+                            IsActive = true,
+                            IsDeleted = false,
                             Name = "Giyim"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 12, 17, 17, 41, 14, 98, DateTimeKind.Local).AddTicks(4554),
+                            CreatedAt = new DateTime(2025, 12, 20, 18, 18, 4, 765, DateTimeKind.Local).AddTicks(4838),
                             Description = "Yiyecek ve içecek ürünleri",
+                            IsActive = true,
+                            IsDeleted = false,
                             Name = "Yiyecek & İçecek"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 12, 17, 17, 41, 14, 98, DateTimeKind.Local).AddTicks(4556),
+                            CreatedAt = new DateTime(2025, 12, 20, 18, 18, 4, 765, DateTimeKind.Local).AddTicks(4879),
                             Description = "Ev ve bahçe ürünleri",
+                            IsActive = true,
+                            IsDeleted = false,
                             Name = "Ev & Bahçe"
                         });
                 });
@@ -317,6 +331,12 @@ namespace urunsatisportali.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -364,6 +384,9 @@ namespace urunsatisportali.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -398,9 +421,10 @@ namespace urunsatisportali.Migrations
                             Id = 1,
                             Brand = "TechMarka",
                             CategoryId = 1,
-                            CreatedAt = new DateTime(2025, 12, 17, 17, 41, 14, 98, DateTimeKind.Local).AddTicks(4707),
+                            CreatedAt = new DateTime(2025, 12, 20, 18, 18, 4, 765, DateTimeKind.Local).AddTicks(5044),
                             Description = "Yüksek performanslı dizüstü bilgisayar",
                             IsActive = true,
+                            IsDeleted = false,
                             Name = "Dizüstü Bilgisayar",
                             Price = 12999.99m,
                             SKU = "LAP-001",
@@ -412,9 +436,10 @@ namespace urunsatisportali.Migrations
                             Id = 2,
                             Brand = "TechMarka",
                             CategoryId = 1,
-                            CreatedAt = new DateTime(2025, 12, 17, 17, 41, 14, 98, DateTimeKind.Local).AddTicks(4711),
+                            CreatedAt = new DateTime(2025, 12, 20, 18, 18, 4, 765, DateTimeKind.Local).AddTicks(5046),
                             Description = "Ergonomik kablosuz fare",
                             IsActive = true,
+                            IsDeleted = false,
                             Name = "Kablosuz Fare",
                             Price = 299.99m,
                             SKU = "MOU-001",
@@ -426,15 +451,38 @@ namespace urunsatisportali.Migrations
                             Id = 3,
                             Brand = "ModaMarka",
                             CategoryId = 2,
-                            CreatedAt = new DateTime(2025, 12, 17, 17, 41, 14, 98, DateTimeKind.Local).AddTicks(4713),
+                            CreatedAt = new DateTime(2025, 12, 20, 18, 18, 4, 765, DateTimeKind.Local).AddTicks(5049),
                             Description = "Rahat pamuklu tişört",
                             IsActive = true,
+                            IsDeleted = false,
                             Name = "Pamuklu Tişört",
                             Price = 199.99m,
                             SKU = "TSH-001",
                             StockQuantity = 150,
                             Unit = "Piece"
                         });
+                });
+
+            modelBuilder.Entity("urunsatisportali.Models.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("urunsatisportali.Models.Sale", b =>
@@ -456,6 +504,12 @@ namespace urunsatisportali.Migrations
 
                     b.Property<decimal>("FinalAmount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(500)
@@ -483,9 +537,14 @@ namespace urunsatisportali.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Sales");
                 });
@@ -504,6 +563,12 @@ namespace urunsatisportali.Migrations
                     b.Property<decimal>("Discount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -518,6 +583,9 @@ namespace urunsatisportali.Migrations
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -589,6 +657,17 @@ namespace urunsatisportali.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("urunsatisportali.Models.ProductImage", b =>
+                {
+                    b.HasOne("urunsatisportali.Models.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("urunsatisportali.Models.Sale", b =>
                 {
                     b.HasOne("urunsatisportali.Models.Customer", "Customer")
@@ -596,7 +675,13 @@ namespace urunsatisportali.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("urunsatisportali.Models.ApplicationUser", "User")
+                        .WithMany("Sales")
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Customer");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("urunsatisportali.Models.SaleItem", b =>
@@ -618,6 +703,11 @@ namespace urunsatisportali.Migrations
                     b.Navigation("Sale");
                 });
 
+            modelBuilder.Entity("urunsatisportali.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Sales");
+                });
+
             modelBuilder.Entity("urunsatisportali.Models.Category", b =>
                 {
                     b.Navigation("Products");
@@ -630,6 +720,8 @@ namespace urunsatisportali.Migrations
 
             modelBuilder.Entity("urunsatisportali.Models.Product", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("SaleItems");
                 });
 

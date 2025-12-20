@@ -12,5 +12,6 @@ namespace urunsatisportali.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? LastLoginAt { get; set; }
+        public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
     }
 }

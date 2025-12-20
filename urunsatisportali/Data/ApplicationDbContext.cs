@@ -11,11 +11,12 @@ namespace urunsatisportali.Data
         {
         }
 
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Customer> Customers { get; set; }
-        public DbSet<Sale> Sales { get; set; }
-        public DbSet<SaleItem> SaleItems { get; set; }
+        public DbSet<Category> Categories { get; set; } = default!;
+        public DbSet<Product> Products { get; set; } = default!;
+        public DbSet<Customer> Customers { get; set; } = default!;
+        public DbSet<Sale> Sales { get; set; } = default!;
+        public DbSet<SaleItem> SaleItems { get; set; } = default!;
+        public DbSet<ProductImage> ProductImages { get; set; } = default!;
         // Removed custom Users DbSet in favor of ASP.NET Core Identity
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,6 +47,12 @@ namespace urunsatisportali.Data
                 .WithMany(p => p.SaleItems)
                 .HasForeignKey(si => si.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ProductImage>()
+                .HasOne(pi => pi.Product)
+                .WithMany(p => p.Images)
+                .HasForeignKey(pi => pi.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Seed initial data (except users; Identity will handle users/roles)
             SeedData(modelBuilder);

@@ -1,6 +1,6 @@
 @model urunsatisportali.Models.User
 @{
-    ViewData["Title"] = "Giriş Yap";
+    ViewData["Title"] = "Yönetici Girişi";
     Layout = "_Layout";
 }
 
@@ -9,8 +9,8 @@
         <div class="col-md-5">
             <div class="card shadow">
                 <div class="card-body p-5">
-                    <h2 class="text-center mb-4"><i class="bi bi-box-arrow-in-right"></i> Giriş Yap</h2>
-                    
+                    <h2 class="text-center mb-4"><i class="bi bi-shield-lock"></i> Yönetici Girişi</h2>
+
                     @if (ViewBag.Error != null)
                     {
                         <div class="alert alert-danger" role="alert">
@@ -34,22 +34,23 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Giriş Yap</button>
+                            <button type="submit" class="btn btn-dark btn-lg">Giriş Yap</button>
                         </div>
                     </form>
-
-                    <hr class="my-4">
-
-                    <div class="text-center">
-                        <p class="mb-0">Hesabınız yok mu? <a asp-action="SignUp">Kayıt Ol</a></p>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
 
