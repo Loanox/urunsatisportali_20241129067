@@ -2,16 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace urunsatisportali.Models
 {
-    public class Customer
+    public class Customer : BaseEntity
     {
-        public int Id { get; set; }
-
-        [Required(ErrorMessage = "Müþteri adý gereklidir")]
+        [Required(ErrorMessage = "MÃ¼ÅŸteri adÄ± gereklidir")]
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(100)]
-        [EmailAddress(ErrorMessage = "Geçerli bir e-posta adresi giriniz")]
+        [EmailAddress(ErrorMessage = "GeÃ§erli bir e-posta adresi giriniz")]
         public string? Email { get; set; }
 
         [StringLength(20)]
@@ -29,11 +27,7 @@ namespace urunsatisportali.Models
         [StringLength(50)]
         public string? Country { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime? UpdatedAt { get; set; }
-
         // Navigation property
-        public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
+        public virtual ICollection<Sale> Sales { get; set; } = [];
     }
 }
-

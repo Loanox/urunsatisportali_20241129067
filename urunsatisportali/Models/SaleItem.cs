@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace urunsatisportali.Models
 {
-    public class SaleItem
+    public class SaleItem : BaseEntity
     {
-        public int Id { get; set; }
-
         [Required]
         public int SaleId { get; set; }
 
@@ -28,11 +26,8 @@ namespace urunsatisportali.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-
         // Navigation properties
         public virtual Sale Sale { get; set; } = null!;
         public virtual Product Product { get; set; } = null!;
     }
 }
-

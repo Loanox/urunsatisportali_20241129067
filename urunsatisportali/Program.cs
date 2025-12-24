@@ -4,6 +4,9 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Net.Http.Headers;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Identity;
+using urunsatisportali.Models;
+using urunsatisportali.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +39,49 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add ASP.NET Core Identity
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireLowercase = true;
+        options.Password.RequiredLength = 6;
+        options.SignIn.RequireConfirmedAccount = false;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.LogoutPath = "/Auth/Logout";
+    options.AccessDeniedPath = "/Auth/Login";
+    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+});
+
+// Add Generic Repository
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+// Add Services
+builder.Services.AddScoped<urunsatisportali.Services.ISaleService, urunsatisportali.Services.SaleService>();
+
+builder.Services.AddSignalR();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromDays(7); // 7 days persistence
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".UrunSatis.Session";
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax;
+});
+
 var app = builder.Build();
 
 // Apply pending migrations to ensure database is up to date
@@ -45,12 +91,71 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        context.Database.Migrate();
+        await context.Database.MigrateAsync();
+
+        // Seed Roles
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        string[] roleNames = { "Owner", "Admin", "User" };
+
+        foreach (var roleName in roleNames)
+        {
+            if (!await roleManager.RoleExistsAsync(roleName))
+            {
+                await roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+        }
+
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+        // Seed Owner User
+        var ownerUser = await userManager.FindByNameAsync("owner");
+        if (ownerUser == null)
+        {
+            ownerUser = new ApplicationUser
+            {
+                UserName = "owner",
+                Email = "owner@example.com",
+                EmailConfirmed = true,
+                FullName = "Platform Sahibi",
+                IsAdmin = true, // Keep for backward compat if needed, or rely on Role
+                CreatedAt = DateTime.Now
+            };
+            var result = await userManager.CreateAsync(ownerUser, "Owner123!");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(ownerUser, "Owner");
+                await userManager.AddToRoleAsync(ownerUser, "Admin"); // Owner also has Admin privileges
+            }
+        }
+
+        // Seed Admin User (Existing logic updated)
+        var adminUser = await userManager.FindByNameAsync("admin");
+        if (adminUser == null)
+        {
+            adminUser = new ApplicationUser
+            {
+                UserName = "admin",
+                Email = "admin@example.com",
+                EmailConfirmed = true,
+                FullName = "Yönetici",
+                IsAdmin = true,
+                CreatedAt = DateTime.Now
+            };
+            await userManager.CreateAsync(adminUser, "admin123");
+            await userManager.AddToRoleAsync(adminUser, "Admin");
+        }
+        else
+        {
+            if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+            {
+                await userManager.AddToRoleAsync(adminUser, "Admin");
+            }
+        }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database.");
+        logger.LogError(ex, "An error occurred while migrating the database or seeding Identity.");
     }
 }
 
@@ -76,7 +181,7 @@ app.Use(async (context, next) =>
     context.Items["CSPNonce"] = nonce;
 
     var scriptSrc = app.Environment.IsDevelopment()
-        ? $"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}' 'unsafe-eval'"
+        ? $"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}' 'unsafe-eval' 'unsafe-inline'"
         : $"script-src 'self' https://cdn.jsdelivr.net 'nonce-{nonce}'";
 
     var cspDirectives = new List<string>
@@ -156,10 +261,14 @@ app.Use(async (context, next) =>
 app.UseStaticFiles();
 app.UseCookiePolicy();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<urunsatisportali.Hubs.GeneralHub>("/general-hub");
 
 app.Run();

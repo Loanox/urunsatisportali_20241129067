@@ -1,0 +1,142 @@
+@model urunsatisportali.Models.ApplicationUser
+@using urunsatisportali.Helpers
+@{
+    ViewData["Title"] = "Üye Detayı";
+    Layout = "_AdminLayout";
+    var sales = ViewBag.Sales as IEnumerable<urunsatisportali.Models.Sale>;
+    var userRoles = ViewBag.UserRoles as IList<string>;
+}
+
+<div class="page-header mb-4">
+    <h2><i class="bi bi-person-badge"></i> @(string.IsNullOrEmpty(Model.FullName) ? Model.UserName : Model.FullName)</h2>
+    <a asp-action="Index" class="btn btn-secondary mt-2"><i class="bi bi-arrow-left"></i> Listeye Dön</a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Üye Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Ad Soyad:</strong> @Model.FullName</li>
+                    <li class="list-group-item"><strong>Kullanıcı Adı:</strong> @Model.UserName</li>
+                    <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+                    <li class="list-group-item"><strong>Telefon:</strong> @(Model.PhoneNumber ?? "-")</li>
+                    <li class="list-group-item"><strong>Kayıt Tarihi:</strong> @Model.CreatedAt.ToString("g")</li>
+                    <li class="list-group-item"><strong>Admin mi:</strong> @(Model.IsAdmin ? "Evet" : "Hayır")</li>
+                    <li class="list-group-item">
+                        <strong>Roller:</strong> 
+                        @if (userRoles != null && userRoles.Any())
+                        {
+                            @string.Join(", ", userRoles)
+                        }
+                        else
+                        {
+                            <span class="text-muted">Rol yok</span>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        @if (User.IsInRole("Owner"))
+        {
+            <div class="card mt-3">
+                <div class="card-header bg-warning">
+                    <h5 class="card-title mb-0">Şifre Değiştir</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ChangePassword" method="post">
+                        <input type="hidden" name="userId" value="@Model.Id" />
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Yeni Şifre</label>
+                            <input type="password" name="newPassword" id="newPassword" class="form-control" required />
+                            <small class="form-text text-muted">Minimum 6 karakter, en az 1 küçük harf.</small>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="bi bi-key"></i> Şifreyi Değiştir
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Sipariş Geçmişi</h5>
+            </div>
+            <div class="card-body">
+                @if (sales != null && sales.Any())
+                {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Sipariş No</th>
+                                        <th>Tarih</th>
+                                        <th>Tutar</th>
+                                        <th>Durum</th>
+                                        <th class="text-end">İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var sale in sales)
+                                {
+                                            <tr>
+                                                <td>@sale.SaleNumber</td>
+                                                <td>@sale.SaleDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                                <td>@CurrencyHelper.FormatTurkishLira(sale.FinalAmount)</td>
+                                                <td>
+                                            @if (sale.Status == "Completed")
+                                            {
+                                                            <span class="badge bg-success">Tamamlandı</span>
+                                            }
+                                            else if (sale.Status == "Pending")
+                                            {
+                                                            <span class="badge bg-warning text-dark">Beklemede</span>
+                                            }
+                                            else
+                                            {
+                                                            <span class="badge bg-danger">İptal</span>
+                                            }
+                                                </td>
+                                                <td class="text-end">
+                                                    <a asp-controller="Sales" asp-action="Details" asp-route-id="@sale.Id" 
+                                                       class="btn btn-sm btn-info text-white">
+                                                        <i class="bi bi-eye"></i> Detay
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                }
+                else
+                {
+                        <p class="text-muted text-center py-4">Henüz sipariş bulunmuyor.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

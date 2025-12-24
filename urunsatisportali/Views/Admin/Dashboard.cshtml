@@ -1,11 +1,11 @@
 @using urunsatisportali.Helpers
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Yönetim Paneli";
     Layout = "_AdminLayout";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Dashboard</h2>
+    <h2 class="mb-0">Yönetim Paneli</h2>
     <span class="text-muted">Genel bakış ve hızlı istatistikler</span>
 </div>
 
@@ -42,7 +42,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="text-muted">Toplam Satış</div>
-                        <div class="fs-4 fw-semibold">@ViewBag.TotalSales</div>
+                        <div id="totalSalesCount" class="fs-4 fw-semibold">@ViewBag.TotalSales</div>
                     </div>
                     <div class="text-warning"><i class="bi bi-cart-check" style="font-size: 1.75rem;"></i></div>
                 </div>
@@ -55,9 +55,10 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div class="text-muted">Toplam Gelir</div>
-                        <div class="fs-4 fw-semibold">@(((decimal)ViewBag.TotalRevenue).ToString("C"))</div>
+                        <div id="totalRevenueAmount" class="fs-4 fw-semibold">
+                            @CurrencyHelper.FormatTurkishLira((decimal)ViewBag.TotalRevenue)</div>
                     </div>
-                    <div class="text-danger"><i class="bi bi-currency-dollar" style="font-size: 1.75rem;"></i></div>
+                    <div class="text-danger"><i class="bi bi-currency-lira" style="font-size: 1.75rem;"></i></div>
                 </div>
             </div>
         </div>
@@ -81,7 +82,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var product in (IEnumerable<urunsatisportali.Models.Product>)ViewBag.LowStockList ?? Enumerable.Empty<urunsatisportali.Models.Product>())
+                            @foreach (var product in (IEnumerable<urunsatisportali.Models.Product>)ViewBag.LowStockList
+                            ?? Enumerable.Empty<urunsatisportali.Models.Product>())
                             {
                                 <tr>
                                     <td>@product.Name</td>
@@ -113,8 +115,28 @@
                             {
                                 <tr>
                                     <td>@s.SaleNumber</td>
-                                    <td>@s.Customer?.Name</td>
-                                    <td>@s.FinalAmount.ToString("C")</td>
+                                    <td>
+                                        @if (s.User != null)
+                                        {
+                                            <strong>@s.User.FullName</strong>
+
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="bi bi-envelope"></i> @s.User.Email
+                                                @if (!string.IsNullOrEmpty(s.User.PhoneNumber))
+                                                {
+                                                    <br>
+
+                                                    <i class="bi bi-telephone"></i> @s.User.PhoneNumber
+                                                }
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Misafir</span>
+                                        }
+                                    </td>
+                                    <td>@CurrencyHelper.FormatTurkishLira(s.FinalAmount)</td>
                                     <td>@s.SaleDate.ToString("dd.MM.yyyy HH:mm")</td>
                                 </tr>
                             }
@@ -127,5 +149,7 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script src="~/js/admin-dashboard.js"></script>
 }
 

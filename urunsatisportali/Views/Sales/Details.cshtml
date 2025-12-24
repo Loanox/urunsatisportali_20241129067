@@ -1,0 +1,135 @@
+@using urunsatisportali.Helpers
+@model urunsatisportali.Models.Sale
+@{
+    ViewData["Title"] = "Sipariş Detayı";
+    Layout = "_AdminLayout";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Sipariş Detayı - @Model.SaleNumber</h4>
+            <div class="page-title-right">
+                <a href="@Url.Action("Index")" class="btn btn-soft-secondary"><i
+                        class="ri-arrow-left-line align-middle"></i> Listeye Dön</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-9">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h5 class="card-title flex-grow-1 mb-0">Sipariş #@Model.SaleNumber</h5>
+                    <div class="flex-shrink-0">
+                        <span class="badge bg-success-subtle text-success">@Model.Status</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive table-card">
+                    <table class="table table-nowrap align-middle table-borderless mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th scope="col">Ürün</th>
+                                <th scope="col">Birim Fiyat</th>
+                                <th scope="col">Adet</th>
+                                <th scope="col" class="text-end">Toplam</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SaleItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex">
+                                            <div class="flex-grow-1 ms-3">
+                                                <h5 class="fs-15 mb-0">@item.Product?.Name</h5>
+                                                <p class="text-muted mb-0">SKU: @item.Product?.SKU</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@CurrencyHelper.FormatTurkishLira(item.UnitPrice)</td>
+                                    <td>@item.Quantity</td>
+                                    <td class="text-end">@CurrencyHelper.FormatTurkishLira(item.TotalPrice)</td>
+                                </tr>
+                            }
+                            <tr class="border-top border-top-dashed">
+                                <td colspan="3"></td>
+                                <td colspan="2" class="fw-medium p-0">
+                                    <table class="table table-borderless mb-0">
+                                        <tbody>
+                                            <tr>
+                                                <td>Ara Toplam :</td>
+                                                <td class="text-end">
+                                                    @CurrencyHelper.FormatTurkishLira(Model.TotalAmount)</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Vergi :</td>
+                                                <td class="text-end">@CurrencyHelper.FormatTurkishLira(Model.Tax)</td>
+                                            </tr>
+                                            <tr>
+                                                <td>İndirim :</td>
+                                                <td class="text-end">-@CurrencyHelper.FormatTurkishLira(Model.Discount)
+                                                </td>
+                                            </tr>
+                                            <tr class="border-top border-top-dashed">
+                                                <th scope="row">Genel Toplam :</th>
+                                                <th class="text-end">
+                                                    @CurrencyHelper.FormatTurkishLira(Model.FinalAmount)</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="ri-map-pin-line align-middle me-1 text-muted"></i> Teslimat
+                    Detayları</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">
+                    @Model.Notes
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="ri-user-2-line align-middle me-1 text-muted"></i> Müşteri
+                    Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.User != null)
+                {
+                    <ul class="list-unstyled mb-0 vstack gap-3">
+                        <li>
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="fs-14 mb-1">@Model.User.FullName</h6>
+                                    <p class="text-muted mb-0">@Model.User.Email</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li><i class="ri-phone-line me-2 align-middle text-muted fs-16"></i> @(Model.User.PhoneNumber ??
+                        "-")</li>
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">Misafir Kullanıcı</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

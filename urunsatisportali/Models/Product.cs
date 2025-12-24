@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace urunsatisportali.Models
 {
-    public class Product
+    public class Product : BaseEntity
     {
-        public int Id { get; set; }
-
         [Required(ErrorMessage = "Ürün adı zorunludur")]
         [StringLength(200, ErrorMessage = "Ürün adı en fazla 200 karakter olabilir")]
         public string Name { get; set; } = string.Empty;
@@ -32,17 +30,13 @@ namespace urunsatisportali.Models
         [StringLength(50, ErrorMessage = "Birim en fazla 50 karakter olabilir")]
         public string? Unit { get; set; } = "Piece";
 
-        public bool IsActive { get; set; } = true;
-
         // CategoryId made nullable to make category optional
         public int? CategoryId { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime? UpdatedAt { get; set; }
-
         // Navigation properties
         public virtual Category? Category { get; set; }
-        public virtual ICollection<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
+        public virtual ICollection<SaleItem> SaleItems { get; set; } = [];
+        public virtual ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     }
 }
 

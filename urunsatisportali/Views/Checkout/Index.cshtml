@@ -1,0 +1,307 @@
+@using urunsatisportali.Helpers
+@model urunsatisportali.Models.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Ödeme";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Breadcrumb -->
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">Ödeme</h4>
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Shop")">Mağaza</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Cart")">Sepet</a></li>
+                    <li class="breadcrumb-item active">Ödeme</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-body checkout-tab">
+                <form asp-action="PlaceOrder" method="post">
+                    <div class="step-arrow-nav mt-n3 mx-n3 mb-3">
+                        <ul class="nav nav-pills nav-justified custom-nav" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fs-15 p-3 active" id="pills-bill-info-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-bill-info" type="button" role="tab"
+                                    aria-controls="pills-bill-info" aria-selected="true">
+                                    <i
+                                        class="ri-user-2-line fs-16 p-2 bg-primary-subtle text-primary rounded-circle align-middle me-2"></i>
+                                    Kişisel Bilgiler
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fs-15 p-3" id="pills-bill-address-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-bill-address" type="button" role="tab"
+                                    aria-controls="pills-bill-address" aria-selected="false">
+                                    <i
+                                        class="ri-truck-line fs-16 p-2 bg-primary-subtle text-primary rounded-circle align-middle me-2"></i>
+                                    Teslimat Bilgileri
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fs-15 p-3" id="pills-payment-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-payment" type="button" role="tab"
+                                    aria-controls="pills-payment" aria-selected="false">
+                                    <i
+                                        class="ri-bank-card-line fs-16 p-2 bg-primary-subtle text-primary rounded-circle align-middle me-2"></i>
+                                    Ödeme Bilgileri
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- Personal Info Tab -->
+                        <div class="tab-pane fade show active" id="pills-bill-info" role="tabpanel"
+                            aria-labelledby="pills-bill-info-tab">
+                            <div>
+                                <h5 class="mb-1">Fatura Bilgileri</h5>
+                                <p class="text-muted mb-4">Lütfen aşağıdaki tüm bilgileri doldurun</p>
+                            </div>
+                            <div asp-validation-summary="All" class="text-danger"></div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label asp-for="FirstName" class="form-label">Ad *</label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Adınızı girin"
+                                            required>
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label asp-for="LastName" class="form-label">Soyad *</label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Soyadınızı girin"
+                                            required>
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label asp-for="Email" class="form-label">E-posta *</label>
+                                        <input asp-for="Email" class="form-control"
+                                            placeholder="E-posta adresinizi girin" required>
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="mb-3">
+                                        <label asp-for="Phone" class="form-label">Telefon *</label>
+                                        <input asp-for="Phone" class="form-control"
+                                            placeholder="Telefon numarasını girin" required>
+                                        <span asp-validation-for="Phone" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-start gap-3 mt-3">
+                                <button type="button" class="btn btn-primary btn-label right ms-auto nexttab"
+                                    data-nexttab="pills-bill-address-tab">
+                                    <i class="ri-truck-line label-icon align-middle fs-16 ms-2"></i>Teslimat Bilgilerine
+                                    Geç
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Info Tab -->
+                        <div class="tab-pane fade" id="pills-bill-address" role="tabpanel"
+                            aria-labelledby="pills-bill-address-tab">
+                            <div>
+                                <h5 class="mb-1">Teslimat Bilgileri</h5>
+                                <p class="text-muted mb-4">Lütfen aşağıdaki tüm bilgileri doldurun</p>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label asp-for="Address" class="form-label">Adres *</label>
+                                        <textarea asp-for="Address" class="form-control" rows="3"
+                                            placeholder="Tam adresinizi girin" required></textarea>
+                                        <span asp-validation-for="Address" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="mb-3">
+                                        <label asp-for="Country" class="form-label">Ülke *</label>
+                                        <input asp-for="Country" class="form-control" placeholder="Ülke" required>
+                                        <span asp-validation-for="Country" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="mb-3">
+                                        <label asp-for="City" class="form-label">Şehir *</label>
+                                        <input asp-for="City" class="form-control" placeholder="Şehir" required>
+                                        <span asp-validation-for="City" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="mb-3">
+                                        <label asp-for="ZipCode" class="form-label">Posta Kodu *</label>
+                                        <input asp-for="ZipCode" class="form-control" placeholder="Posta Kodu" required>
+                                        <span asp-validation-for="ZipCode" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start gap-3 mt-4">
+                                <button type="button" class="btn btn-light btn-label previestab"
+                                    data-previous="pills-bill-info-tab">
+                                    <i class="ri-arrow-left-line label-icon align-middle fs-16 me-2"></i>Kişisel
+                                    Bilgilere Dön
+                                </button>
+                                <button type="button" class="btn btn-primary btn-label right ms-auto nexttab"
+                                    data-nexttab="pills-payment-tab">
+                                    <i class="ri-bank-card-line label-icon align-middle fs-16 ms-2"></i>Ödemeye Devam Et
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Payment Info Tab -->
+                        <div class="tab-pane fade" id="pills-payment" role="tabpanel"
+                            aria-labelledby="pills-payment-tab">
+                            <div>
+                                <h5 class="mb-1">Ödeme Yöntemi Seçin</h5>
+                                <p class="text-muted mb-4">Ödeme yöntemini seçin</p>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-lg-4 col-sm-6">
+                                    <div data-bs-toggle="collapse" data-bs-target="#paymentmethodCollapse.show"
+                                        aria-expanded="false" aria-controls="paymentmethodCollapse">
+                                        <div class="form-check card-radio">
+                                            <input id="paymentMethod01" name="PaymentMethod" type="radio"
+                                                class="form-check-input" value="COD" checked>
+                                            <label class="form-check-label" for="paymentMethod01">
+                                                <span class="fs-16 text-muted me-2"><i
+                                                        class="ri-money-dollar-box-fill align-bottom"></i></span>
+                                                <span class="fs-14 text-wrap">Kapıda Ödeme</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Add other methods if needed -->
+                            </div>
+
+                            <div class="d-flex align-items-start gap-3 mt-4">
+                                <button type="button" class="btn btn-light btn-label previestab"
+                                    data-previous="pills-bill-address-tab">
+                                    <i class="ri-arrow-left-line label-icon align-middle fs-16 me-2"></i>Teslimat
+                                    Bilgilerine Dön
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-label right ms-auto">
+                                    <i class="ri-shopping-basket-line label-icon align-middle fs-16 ms-2"></i>Siparişi
+                                    Tamamla
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-0">Sipariş Özeti</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive table-card">
+                    <table class="table table-borderless align-middle mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th style="width: 90px;" scope="col">Ürün</th>
+                                <th scope="col">Ürün Bilgisi</th>
+                                <th scope="col" class="text-end">Fiyat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Cart.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="avatar-md bg-light rounded p-1">
+                                            <img src="@Url.Content(item.ImageUrl)" alt="" class="img-fluid d-block">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h5 class="fs-14"><a href="#" class="text-body">@item.ProductName</a></h5>
+                                        <p class="text-muted mb-0">x @item.Quantity</p>
+                                    </td>
+                                    <td class="text-end">@CurrencyHelper.FormatTurkishLira(item.Total)</td>
+                                </tr>
+                            }
+                            <tr class="table-active">
+                                <th colspan="2">Toplam (TL) :</th>
+                                <td class="text-end">
+                                    <span class="fw-semibold">
+                                        @CurrencyHelper.FormatTurkishLira(Model.Cart.GrandTotal)
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script nonce="@Context.Items["CSPNonce"]">
+        $(document).ready(function () {
+            // Next button click handlers
+            $('.nexttab').on('click', function () {
+                var nextTabId = $(this).data('nexttab');
+                var currentTabPane = $(this).closest('.tab-pane');
+                var isValid = true;
+
+                // Validate all inputs in the current tab
+                currentTabPane.find('input, select, textarea').each(function () {
+                    // Check validity using jQuery Validate's .valid()
+                    if ($(this).prop('required')) {
+                        if (!$(this).valid()) {
+                            isValid = false;
+                        }
+                    }
+                });
+
+                if (isValid) {
+                    if (nextTabId) {
+                        var nextTab = document.getElementById(nextTabId);
+                        if (nextTab) {
+                            var tab = new bootstrap.Tab(nextTab);
+                            tab.show();
+                        }
+                    }
+                }
+            });
+
+            // Previous button click handlers
+            $('.previestab').on('click', function () {
+                var prevTabId = $(this).data('previous');
+                if (prevTabId) {
+                    var prevTab = document.getElementById(prevTabId);
+                    if (prevTab) {
+                        var tab = new bootstrap.Tab(prevTab);
+                        tab.show();
+                    }
+                }
+            });
+        });
+    </script>
+}

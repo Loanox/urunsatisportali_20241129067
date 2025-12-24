@@ -3,16 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace urunsatisportali.Models
 {
-    public class Sale
+    public class Sale : BaseEntity
     {
-        public int Id { get; set; }
-
         [Required]
         [StringLength(50)]
         public string SaleNumber { get; set; } = string.Empty;
 
         // Customer is optional
         public int? CustomerId { get; set; }
+
+        public string? UserId { get; set; }
+        public virtual ApplicationUser? User { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
@@ -35,12 +36,9 @@ namespace urunsatisportali.Models
         public string? Notes { get; set; }
 
         public DateTime SaleDate { get; set; } = DateTime.Now;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime? UpdatedAt { get; set; }
 
         // Navigation properties
         public virtual Customer? Customer { get; set; }
-        public virtual ICollection<SaleItem> SaleItems { get; set; } = new List<SaleItem>();
+        public virtual ICollection<SaleItem> SaleItems { get; set; } = [];
     }
 }
-

@@ -1,21 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using urunsatisportali.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace urunsatisportali.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Customer> Customers { get; set; }
-        public DbSet<Sale> Sales { get; set; }
-        public DbSet<SaleItem> SaleItems { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<Category> Categories { get; set; } = default!;
+        public DbSet<Product> Products { get; set; } = default!;
+        public DbSet<Customer> Customers { get; set; } = default!;
+        public DbSet<Sale> Sales { get; set; } = default!;
+        public DbSet<SaleItem> SaleItems { get; set; } = default!;
+        public DbSet<ProductImage> ProductImages { get; set; } = default!;
+        // Removed custom Users DbSet in favor of ASP.NET Core Identity
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,7 +48,13 @@ namespace urunsatisportali.Data
                 .HasForeignKey(si => si.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Seed initial data
+            modelBuilder.Entity<ProductImage>()
+                .HasOne(pi => pi.Product)
+                .WithMany(p => p.Images)
+                .HasForeignKey(pi => pi.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Seed initial data (except users; Identity will handle users/roles)
             SeedData(modelBuilder);
         }
 
@@ -100,19 +108,7 @@ namespace urunsatisportali.Data
                 }
             );
 
-            // Seed Admin User (password: admin123)
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Username = "admin",
-                    Email = "admin@example.com",
-                    Password = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                    FullName = "Yönetici",
-                    IsAdmin = true,
-                    CreatedAt = DateTime.Now
-                }
-            );
+            // No user seeding here; handled via Identity in Program.cs
         }
     }
 }

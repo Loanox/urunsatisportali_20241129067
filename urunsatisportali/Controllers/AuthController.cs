@@ -1,21 +1,23 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
-using urunsatisportali.Data;
 using urunsatisportali.Models;
 
 namespace urunsatisportali.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AuthController> _logger;
         private readonly IWebHostEnvironment _environment;
 
-        public AuthController(ApplicationDbContext context, ILogger<AuthController> logger, IWebHostEnvironment environment)
+        public AuthController(SignInManager<ApplicationUser> signInManager,
+                              UserManager<ApplicationUser> userManager,
+                              ILogger<AuthController> logger,
+                              IWebHostEnvironment environment)
         {
-            _context = context;
+            _signInManager = signInManager;
+            _userManager = userManager;
             _logger = logger;
             _environment = environment;
         }
@@ -23,7 +25,7 @@ namespace urunsatisportali.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            if (IsLoggedIn())
+            if (User?.Identity?.IsAuthenticated == true)
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
@@ -42,30 +44,32 @@ namespace urunsatisportali.Controllers
 
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-                
-                if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
+                var user = await _userManager.FindByNameAsync(username);
+                if (user == null)
                 {
                     ViewBag.Error = "Kullanıcı adı veya şifre hatalı";
                     return View();
                 }
 
-                // Update last login
-                user.LastLoginAt = DateTime.Now;
-                await _context.SaveChangesAsync();
+                // Check for Admin or Owner role
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                var isOwner = await _userManager.IsInRoleAsync(user, "Owner");
 
-                // Set cookie
-                var cookieOptions = new CookieOptions
+                if (!isAdmin && !isOwner)
                 {
-                    HttpOnly = true,
-                    Secure = Request.IsHttps,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.Now.AddDays(7)
-                };
+                    ViewBag.Error = "Bu panele erişim yetkiniz yok.";
+                    return View();
+                }
 
-                Response.Cookies.Append("UserId", user.Id.ToString(), cookieOptions);
-                Response.Cookies.Append("Username", user.Username, cookieOptions);
-                Response.Cookies.Append("IsAdmin", user.IsAdmin.ToString(), cookieOptions);
+                var result = await _signInManager.PasswordSignInAsync(user, password, isPersistent: true, lockoutOnFailure: false);
+                if (!result.Succeeded)
+                {
+                    ViewBag.Error = "Kullanıcı adı veya şifre hatalı";
+                    return View();
+                }
+
+                user.LastLoginAt = DateTime.Now;
+                await _userManager.UpdateAsync(user);
 
                 return RedirectToAction("Dashboard", "Admin");
             }
@@ -81,87 +85,12 @@ namespace urunsatisportali.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult SignUp()
-        {
-            if (IsLoggedIn())
-            {
-                return RedirectToAction("Dashboard", "Admin");
-            }
-            return View();
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignUp(User user)
+        public async Task<IActionResult> Logout()
         {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    // Check if username or email already exists
-                    if (await _context.Users.AnyAsync(u => u.Username == user.Username))
-                    {
-                        ViewBag.Error = "Bu kullanıcı adı zaten kullanılıyor";
-                        return View(user);
-                    }
-
-                    if (await _context.Users.AnyAsync(u => u.Email == user.Email))
-                    {
-                        ViewBag.Error = "Bu e-posta adresi zaten kullanılıyor";
-                        return View(user);
-                    }
-
-                    // Hash password
-                    user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-                    user.CreatedAt = DateTime.Now;
-                    user.IsAdmin = false;
-
-                    _context.Users.Add(user);
-                    await _context.SaveChangesAsync();
-
-                    // Auto login
-                    var cookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = Request.IsHttps,
-                        SameSite = SameSiteMode.Strict,
-                        Expires = DateTime.Now.AddDays(7)
-                    };
-
-                    Response.Cookies.Append("UserId", user.Id.ToString(), cookieOptions);
-                    Response.Cookies.Append("Username", user.Username, cookieOptions);
-                    Response.Cookies.Append("IsAdmin", user.IsAdmin.ToString(), cookieOptions);
-
-                    return RedirectToAction("Dashboard", "Admin");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error during user sign up");
-                    ViewBag.Error = "Kayıt işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
-                    if (_environment.IsDevelopment())
-                    {
-                        ViewBag.Error += $" Hata: {ex.Message}";
-                    }
-                    return View(user);
-                }
-            }
-
-            return View(user);
-        }
-
-        [HttpPost]
-        public IActionResult Logout()
-        {
-            Response.Cookies.Delete("UserId");
-            Response.Cookies.Delete("Username");
-            Response.Cookies.Delete("IsAdmin");
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
-        }
-
-        private bool IsLoggedIn()
-        {
-            return Request.Cookies.ContainsKey("UserId");
         }
     }
 }
