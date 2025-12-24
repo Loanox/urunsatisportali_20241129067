@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using urunsatisportali.Models;
-
+//final
 namespace urunsatisportali.Controllers
 {
     public class AccountController(SignInManager<ApplicationUser> signInManager,
