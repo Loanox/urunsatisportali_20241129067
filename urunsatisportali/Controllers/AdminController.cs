@@ -40,6 +40,7 @@ namespace urunsatisportali.Controllers
                 .ToListAsync();
             var recentSales = await _context.Sales
                 .Include(s => s.Customer)
+                .Include(s => s.User)
                 .OrderByDescending(s => s.SaleDate)
                 .Take(10)
                 .ToListAsync();

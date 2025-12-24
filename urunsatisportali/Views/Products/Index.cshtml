@@ -54,32 +54,42 @@
                 <tbody>
                     @foreach (var p in Model)
                     {
-                            <tr>
-                                <td>@p.Name</td>
-                                <td>@CurrencyHelper.FormatTurkishLira(p.Price)</td>
-                                <td>
-                                    <span class="badge @(p.StockQuantity < 10 ? "bg-warning" : "bg-success")">
+                        <tr>
+                            <td>@p.Name</td>
+                            <td>@CurrencyHelper.FormatTurkishLira(p.Price)</td>
+                            <td>
+                                <span class="badge @(p.StockQuantity < 10 ? "bg-warning" : "bg-success")">
                                     @p.StockQuantity @p.Unit
-                                    </span>
-                                </td>
-                                <td>@(p.Category?.Name ?? "Kategori yok")</td>
-                                <td class="text-end">
-                                    <div class="btn-group" role="group">
-                                        <a asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-info text-white"
-                                            title="Detay">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-primary"
-                                            title="Düzenle">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal" data-id="@p.Id" data-name="@p.Name" title="Sil">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                </span>
+                            </td>
+                            <td>@(p.Category?.Name ?? "Kategori yok")</td>
+                            <td class="text-end">
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="ri-more-fill align-middle"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a asp-action="Details" asp-route-id="@p.Id" class="dropdown-item">
+                                                <i class="ri-eye-fill align-bottom me-2 text-muted"></i> Detay
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a asp-action="Edit" asp-route-id="@p.Id" class="dropdown-item edit-item-btn">
+                                                <i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Düzenle
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item remove-item-btn" href="#" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal" data-id="@p.Id" data-name="@p.Name">
+                                                <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Sil
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>

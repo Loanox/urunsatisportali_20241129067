@@ -41,15 +41,22 @@
                                     <td>
                                         @if (item.User != null)
                                         {
-                                            <span>@item.User.FullName (@item.User.UserName)</span>
-                                        }
-                                        else if (item.Customer != null)
-                                        {
-                                            <span>@item.Customer.Name</span>
+                                            <strong>@item.User.FullName</strong>
+
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="bi bi-envelope"></i> @item.User.Email
+                                                @if (!string.IsNullOrEmpty(item.User.PhoneNumber))
+                                                {
+                                                    <br>
+
+                                                    <i class="bi bi-telephone"></i> @item.User.PhoneNumber
+                                                }
+                                            </small>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">Misafir / Bilinmiyor</span>
+                                            <span class="text-muted">Misafir</span>
                                         }
                                     </td>
                                     <td>@item.SaleDate.ToString("g")</td>

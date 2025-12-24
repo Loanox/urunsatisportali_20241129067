@@ -115,7 +115,27 @@
                             {
                                 <tr>
                                     <td>@s.SaleNumber</td>
-                                    <td>@s.Customer?.Name</td>
+                                    <td>
+                                        @if (s.User != null)
+                                        {
+                                            <strong>@s.User.FullName</strong>
+
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="bi bi-envelope"></i> @s.User.Email
+                                                @if (!string.IsNullOrEmpty(s.User.PhoneNumber))
+                                                {
+                                                    <br>
+
+                                                    <i class="bi bi-telephone"></i> @s.User.PhoneNumber
+                                                }
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Misafir</span>
+                                        }
+                                    </td>
                                     <td>@CurrencyHelper.FormatTurkishLira(s.FinalAmount)</td>
                                     <td>@s.SaleDate.ToString("dd.MM.yyyy HH:mm")</td>
                                 </tr>

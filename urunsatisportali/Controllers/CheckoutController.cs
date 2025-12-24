@@ -28,7 +28,9 @@ namespace urunsatisportali.Controllers
             {
                 return RedirectToAction("Index", "Cart");
             }
-            return View(cart);
+
+            var model = new CheckoutViewModel { Cart = cart };
+            return View(model);
         }
 
         [HttpPost]
@@ -40,10 +42,11 @@ namespace urunsatisportali.Controllers
                 return RedirectToAction("Index", "Shop");
             }
 
+            model.Cart = cart; // Ensure cart is available for re-display
+
             if (!ModelState.IsValid)
             {
-                ViewBag.CheckoutModel = model; // Pass back input
-                return View("Index", cart);
+                return View("Index", model);
             }
 
             var sale = new Sale
@@ -77,8 +80,7 @@ namespace urunsatisportali.Controllers
             else
             {
                 ModelState.AddModelError("", result.Message ?? "Bir hata oluştu.");
-                ViewBag.CheckoutModel = model;
-                return View("Index", cart);
+                return View("Index", model);
             }
         }
 

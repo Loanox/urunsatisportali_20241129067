@@ -1,9 +1,8 @@
 @using urunsatisportali.Helpers
-@model urunsatisportali.Models.ViewModels.CartViewModel
+@model urunsatisportali.Models.ViewModels.CheckoutViewModel
 @{
     ViewData["Title"] = "Ödeme";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var checkout = ViewBag.CheckoutModel as urunsatisportali.Models.ViewModels.CheckoutViewModel;
 }
 
 <!-- Breadcrumb -->
@@ -73,30 +72,34 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="mb-3">
-                                        <label for="FirstName" class="form-label">Ad</label>
-                                        <input type="text" class="form-control" id="FirstName" name="FirstName"
-                                            placeholder="Adınızı girin" value="@checkout?.FirstName" required>
+                                        <label asp-for="FirstName" class="form-label">Ad *</label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Adınızı girin"
+                                            required>
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="mb-3">
-                                        <label for="LastName" class="form-label">Soyad</label>
-                                        <input type="text" class="form-control" id="LastName" name="LastName"
-                                            placeholder="Soyadınızı girin" value="@checkout?.LastName" required>
+                                        <label asp-for="LastName" class="form-label">Soyad *</label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Soyadınızı girin"
+                                            required>
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="mb-3">
-                                        <label for="Email" class="form-label">E-posta</label>
-                                        <input type="email" class="form-control" id="Email" name="Email"
-                                            placeholder="E-posta adresinizi girin" value="@checkout?.Email" required>
+                                        <label asp-for="Email" class="form-label">E-posta *</label>
+                                        <input asp-for="Email" class="form-control"
+                                            placeholder="E-posta adresinizi girin" required>
+                                        <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="mb-3">
-                                        <label for="Phone" class="form-label">Telefon</label>
-                                        <input type="text" class="form-control" id="Phone" name="Phone"
-                                            placeholder="Telefon numarasını girin" value="@checkout?.Phone" required>
+                                        <label asp-for="Phone" class="form-label">Telefon *</label>
+                                        <input asp-for="Phone" class="form-control"
+                                            placeholder="Telefon numarasını girin" required>
+                                        <span asp-validation-for="Phone" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -119,30 +122,31 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="mb-3">
-                                        <label for="Address" class="form-label">Adres</label>
-                                        <textarea class="form-control" id="Address" name="Address" rows="3"
-                                            placeholder="Tam adresinizi girin" required>@checkout?.Address</textarea>
+                                        <label asp-for="Address" class="form-label">Adres *</label>
+                                        <textarea asp-for="Address" class="form-control" rows="3"
+                                            placeholder="Tam adresinizi girin" required></textarea>
+                                        <span asp-validation-for="Address" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="mb-3">
-                                        <label for="Country" class="form-label">Ülke</label>
-                                        <input type="text" class="form-control" id="Country" name="Country"
-                                            value="@checkout?.Country" placeholder="Ülke" required>
+                                        <label asp-for="Country" class="form-label">Ülke *</label>
+                                        <input asp-for="Country" class="form-control" placeholder="Ülke" required>
+                                        <span asp-validation-for="Country" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="mb-3">
-                                        <label for="City" class="form-label">Şehir</label>
-                                        <input type="text" class="form-control" id="City" name="City"
-                                            value="@checkout?.City" placeholder="Şehir" required>
+                                        <label asp-for="City" class="form-label">Şehir *</label>
+                                        <input asp-for="City" class="form-control" placeholder="Şehir" required>
+                                        <span asp-validation-for="City" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="mb-3">
-                                        <label for="ZipCode" class="form-label">Posta Kodu</label>
-                                        <input type="text" class="form-control" id="ZipCode" name="ZipCode"
-                                            value="@checkout?.ZipCode" placeholder="Posta Kodu" required>
+                                        <label asp-for="ZipCode" class="form-label">Posta Kodu *</label>
+                                        <input asp-for="ZipCode" class="form-control" placeholder="Posta Kodu" required>
+                                        <span asp-validation-for="ZipCode" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
@@ -224,7 +228,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Items)
+                            @foreach (var item in Model.Cart.Items)
                             {
                                 <tr>
                                     <td>
@@ -243,7 +247,7 @@
                                 <th colspan="2">Toplam (TL) :</th>
                                 <td class="text-end">
                                     <span class="fw-semibold">
-                                        @CurrencyHelper.FormatTurkishLira(Model.GrandTotal)
+                                        @CurrencyHelper.FormatTurkishLira(Model.Cart.GrandTotal)
                                     </span>
                                 </td>
                             </tr>
@@ -256,12 +260,27 @@
 </div>
 
 @section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
     <script nonce="@Context.Items["CSPNonce"]">
-        document.addEventListener('DOMContentLoaded', function () {
+        $(document).ready(function () {
             // Next button click handlers
-            document.querySelectorAll('.nexttab').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    var nextTabId = this.getAttribute('data-nexttab');
+            $('.nexttab').on('click', function () {
+                var nextTabId = $(this).data('nexttab');
+                var currentTabPane = $(this).closest('.tab-pane');
+                var isValid = true;
+
+                // Validate all inputs in the current tab
+                currentTabPane.find('input, select, textarea').each(function () {
+                    // Check validity using jQuery Validate's .valid()
+                    if ($(this).prop('required')) {
+                        if (!$(this).valid()) {
+                            isValid = false;
+                        }
+                    }
+                });
+
+                if (isValid) {
                     if (nextTabId) {
                         var nextTab = document.getElementById(nextTabId);
                         if (nextTab) {
@@ -269,21 +288,19 @@
                             tab.show();
                         }
                     }
-                });
+                }
             });
 
             // Previous button click handlers
-            document.querySelectorAll('.previestab').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    var prevTabId = this.getAttribute('data-previous');
-                    if (prevTabId) {
-                        var prevTab = document.getElementById(prevTabId);
-                        if (prevTab) {
-                            var tab = new bootstrap.Tab(prevTab);
-                            tab.show();
-                        }
+            $('.previestab').on('click', function () {
+                var prevTabId = $(this).data('previous');
+                if (prevTabId) {
+                    var prevTab = document.getElementById(prevTabId);
+                    if (prevTab) {
+                        var tab = new bootstrap.Tab(prevTab);
+                        tab.show();
                     }
-                });
+                }
             });
         });
     </script>
